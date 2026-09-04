@@ -11,7 +11,10 @@
 import * as THREE from 'three';
 import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.js';
 
-const loader = new THREE.TextureLoader();
+// One shared LoadingManager across every loader in the app, so the progress bar
+// reflects real asset loading rather than a guess.
+export const manager = new THREE.LoadingManager();
+const loader = new THREE.TextureLoader(manager);
 const cache = new Map();
 
 function tex(url, { srgb = false, repeat = [1, 1], aniso = 8 } = {}) {

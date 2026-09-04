@@ -19,7 +19,7 @@ import { ShaderPass } from 'three/addons/postprocessing/ShaderPass.js';
 import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
 import { RGBELoader } from 'three/addons/loaders/RGBELoader.js';
 import Lenis from 'lenis';
-import { pbr, enableAO } from './materials.js';
+import { pbr, enableAO, manager } from './materials.js';
 import { buildRotunda, loadProps, ROT_R, ROT_H } from './rotunda.js';
 import { makeBook } from './book.js';
 
@@ -52,7 +52,7 @@ scene.add(camera);   // the open book is parented to the camera, so it must be i
 let envReady = false;
 const pmrem = new THREE.PMREMGenerator(renderer);
 pmrem.compileEquirectangularShader();
-new RGBELoader().load('assets/hdri/ballroom_2k.hdr', (hdr) => {
+new RGBELoader(manager).load('assets/hdri/ballroom_2k.hdr', (hdr) => {
   hdr.mapping = THREE.EquirectangularReflectionMapping;
   scene.environment = pmrem.fromEquirectangular(hdr).texture;
   scene.environmentIntensity = 0.6;  // a hint of room, not a bright showroom
@@ -763,7 +763,83 @@ if (topicList) {
   });
 }
 
-document.getElementById('loader')?.classList.add('is-gone');
+// =============================================================================
+//  LOADING SCREEN
+//  Real progress from the shared LoadingManager. The canvas fades in behind the
+//  bar once most assets are in — blurred, because at that point some textures
+//  are still arriving — then the blur resolves to nothing as it hands over.
+// =============================================================================
+{
+  const loaderEl = document.getElementById('loader');
+  const barFill = document.getElementById('loader-bar-fill');
+  const pctEl = document.getElementById('loader-pct');
+
+  let target = 0;      // where the manager says we are
+  let shown = 0;       // eased value actually painted
+  let done = false;
+
+  manager.onProgress = (url, loaded, total) => {
+    if (total > 0) target = Math.max(target, loaded / total);
+  };
+
+  function finish() {
+    if (done) return;
+    done = true;
+    target = 1;
+  }
+  manager.onLoad = finish;
+  manager.onError = () => { /* a missing asset must not strand the loader */ };
+
+  // onLoad alone is not enough. This block runs at the end of the module, so on a
+  // warm cache the queue can empty *before* the handler is attached and onLoad
+  // never fires — leaving repeat visitors stuck at 99%. These two flags are the
+  // real "everything heavy is in" signal, so they close the loader independently.
+  function assetsSettled() {
+    return envReady && propsReady;
+  }
+
+  // Safety net: if an asset never resolves, reveal anyway rather than hanging
+  // on a loading screen forever.
+  setTimeout(finish, 20000);
+
+  // Driven by a timer rather than requestAnimationFrame: rAF is paused in a
+  // background tab, which would leave someone staring at a frozen 0% until they
+  // switched to it. A timer keeps ticking (throttled, but it ticks).
+  const tick = setInterval(paint, 33);
+
+  function paint() {
+    if (!done && assetsSettled()) finish();
+
+    if (done) {
+      // Once everything is in, close the bar at a fixed rate. Easing toward 1 is
+      // asymptotic — it rounds to 99% and never actually arrives, which left the
+      // loading screen up indefinitely.
+      shown = Math.min(1, shown + 0.05);
+    } else {
+      // ease toward the target so the bar glides instead of jumping between files
+      shown += (target - shown) * 0.08;
+    }
+    if (shown > 0.999) shown = 1;
+
+    const pct = Math.round(shown * 100);
+    if (barFill) barFill.style.transform = `scaleX(${shown.toFixed(4)})`;
+    if (pctEl) pctEl.textContent = pct + '%';
+
+    // Reveal the scene behind the bar for the back half of the load, blurred.
+    const reveal = THREE.MathUtils.clamp((shown - 0.5) / 0.45, 0, 1);
+    document.documentElement.style.setProperty('--load-reveal', reveal.toFixed(3));
+    document.documentElement.style.setProperty('--load-blur', (30 * (1 - reveal)).toFixed(1) + 'px');
+
+    if (shown === 1) {
+      // hand over: blur resolves to zero and the overlay lifts
+      document.documentElement.style.setProperty('--load-blur', '0px');
+      loaderEl?.classList.add('is-gone');
+      document.body.classList.add('is-loaded');
+      clearInterval(tick);
+    }
+  }
+  paint();
+}
 
 // =============================================================================
 //  ASSET SEAM

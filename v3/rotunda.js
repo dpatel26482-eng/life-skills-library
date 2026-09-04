@@ -8,7 +8,7 @@
 
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
-import { pbr, enableAO, box, spineLabel, glowSprite } from './materials.js';
+import { pbr, enableAO, box, spineLabel, glowSprite, manager } from './materials.js';
 
 export const ROT_R = 16.5;      // drum radius
 export const ROT_H = 14;        // drum height
@@ -364,7 +364,7 @@ export function buildRotunda(centreZ) {
 
 /** Load the CC0 armchair and chandelier and place them in the drum. */
 export async function loadProps(group, onLight) {
-  const loader = new GLTFLoader();
+  const loader = new GLTFLoader(manager);
 
   const [chairGltf, chandGltf] = await Promise.all([
     loader.loadAsync('assets/models/ArmChair_01/ArmChair_01_2k.gltf'),
