@@ -240,3 +240,81 @@ body.is-reading .scroll-track { opacity: 0; transition: opacity .45s ease; }
 
 /* the guide reader and the book use Calibri */
 .book-reader, .book-reader .page, .shelf-instruction { font-family: Calibri, Carlito, "Segoe UI", system-ui, sans-serif; }
+
+
+/* =====================================================================
+   READER REFINEMENTS (v3)
+   Overrides on ../styles.css, kept here so the v2 page is untouched.
+   ===================================================================== */
+
+/* The book title now matches the chapter tabs beneath it rather than the
+   serif display face. */
+.book-reader .reader-heading h2 {
+  font-family: Calibri, Carlito, "Segoe UI", system-ui, sans-serif;
+  font-size: 1.45rem;
+  font-weight: 600;
+  letter-spacing: .01em;
+}
+
+/* Page copy down a couple of points across the board. */
+.book-reader .page,
+.book-reader .leaf-face { font-size: .88rem; line-height: 1.62; }
+.book-reader .page h3,
+.book-reader .leaf-face h3 { font-size: 1.15rem; }
+.book-reader .page p,
+.book-reader .leaf-face p { font-size: .88rem; }
+.book-reader .data-table { font-size: .82rem; }
+.book-reader .page-kicker { font-size: .62rem; }
+
+/* Footer buttons pick up the display serif and the gold of the title. */
+.book-reader .reader-nav {
+  font-family: var(--font-display);
+  font-size: 1.02rem;
+  font-weight: 400;
+  letter-spacing: .015em;
+  padding: .5rem 1.6rem;
+  border-radius: 4px;                       /* squared off, like the book plates */
+  color: var(--gold-soft);
+  background: rgba(240, 200, 119, .06);
+  border: 1px solid rgba(240, 200, 119, .34);
+}
+.book-reader .reader-nav:hover:not(:disabled) {
+  background: rgba(240, 200, 119, .14);
+  border-color: rgba(240, 200, 119, .6);
+  color: var(--cream);
+}
+.book-reader .reader-nav.primary {
+  background: linear-gradient(135deg, var(--gold-soft), var(--gold));
+  border-color: var(--gold);
+  color: #241505;
+  font-weight: 500;
+}
+.book-reader .reader-nav.primary:hover:not(:disabled) {
+  background: linear-gradient(135deg, #ffdf9e, var(--gold-soft));
+  color: #241505;
+}
+.book-reader .reader-shelve {
+  font-family: var(--font-display);
+  font-size: .98rem;
+  color: var(--gold-soft);
+  border-radius: 4px;
+}
+
+/* ---- page-turn seam -------------------------------------------------
+   Mid-flip a hard line opened at the spine: the leaf is a separate 50%-wide
+   element, so on odd container widths it lands half a pixel off the page
+   edge and the dark panel behind showed through. Parchment behind the
+   spread means any residual seam is the same colour as the paper, and the
+   leaf overlaps by a pixel so there is no gap to see. */
+.book-reader .spread { background: var(--parchment-dim); border-radius: 16px; }
+.book-reader .leaf {
+  width: calc(50% + 1px);
+  will-change: transform;
+}
+.book-reader .leaf-face {
+  border-radius: 0 16px 16px 0;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  transform: translateZ(0);                 /* own layer: stops repaint tearing */
+}
+.book-reader .leaf-back { border-radius: 16px 0 0 16px; }
