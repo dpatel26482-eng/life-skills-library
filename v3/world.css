@@ -75,7 +75,7 @@ body.is-loaded #stage-canvas {
 @keyframes loader-breathe { 0%,100% { opacity: .45; } 50% { opacity: 1; } }
 
 /* ------------------------------------------------------------------- chrome */
-.v3-nav { position: fixed; z-index: 20; }
+.v3-nav { position: fixed; z-index: 26; }
 
 /* Home Screen sits in the same typeface and weight as the other menu items
    rather than the serif wordmark it inherited. */

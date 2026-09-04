@@ -576,16 +576,13 @@ function pullBook(mesh) {
     lookFrom: lookTarget.clone(),
     lookTo: _bookWorld.clone(),
     bookFrom: _bookWorld.clone(),
-    bookFromLocal: null
   };
 
   document.body.classList.add('is-reading');
   rig.group.visible = true;
   rig.setOpen(0);
   rig.group.quaternion.identity();
-  // start where the book sits on the shelf, expressed in camera space
-  reading.bookFromLocal = camera.worldToLocal(_bookWorld.clone());
-  rig.group.position.copy(reading.bookFromLocal);
+  rig.group.position.copy(camera.worldToLocal(_bookWorld.clone()));
   rig.group.scale.setScalar(0.3);
   // The spine has a glow sprite and a printed label parented alongside it. Hiding
   // only the mesh left those on the shelf, so the book you clicked still appeared
@@ -650,11 +647,19 @@ function updateReading(dt) {
 // Slide the book from its shelf slot to a fixed spot in front of the lens.
 // All in camera space, so "in front of the lens" is simply -Z.
 const READ_POS = new THREE.Vector3(0, -0.06, -2.5);
+const _slotWorld = new THREE.Vector3();
 function placeOpenBook(e) {
   const r = reading;
-  if (!r.bookFromLocal) return;
   readingLight.intensity = 2.2 * e;
-  r.rig.group.position.lerpVectors(r.bookFromLocal, READ_POS, e);
+
+  // Recompute the shelf slot in camera space every frame. It was captured once,
+  // at pull time — but the camera moves during the flight, so on the way back
+  // that stale point no longer matched the shelf and the book sank into the
+  // wrong place. The slot is fixed in the world; only the camera moves.
+  r.mesh.getWorldPosition(_slotWorld);
+  const slotLocal = camera.worldToLocal(_slotWorld.clone());
+
+  r.rig.group.position.lerpVectors(slotLocal, READ_POS, e);
   r.rig.group.scale.setScalar(THREE.MathUtils.lerp(0.3, 1.0, e));
   r.rig.group.quaternion.identity();
 }
@@ -741,10 +746,19 @@ window.addEventListener('resize', () => {
 });
 
 // ------------------------------------------------------------------- chrome --
+// The menu overrides an open book. Reading mode owns the camera, so a seek
+// issued underneath it scrolled the page but left the view pinned to the book —
+// which read as the menu being dead. Shut the book first, then travel.
+function seekFromChrome(p) {
+  if (reading && reading.phase === 'read') closeBookScene();
+  if (window.LLReader?.isOpen()) window.LLReader.close();
+  seek(p);
+}
+
 document.querySelectorAll('[data-seek]').forEach((btn) => {
-  btn.addEventListener('click', () => seek(parseFloat(btn.dataset.seek)));
+  btn.addEventListener('click', () => seekFromChrome(parseFloat(btn.dataset.seek)));
 });
-document.getElementById('letter-to-shelf')?.addEventListener('click', () => seek(0.85));
+document.getElementById('letter-to-shelf')?.addEventListener('click', () => seekFromChrome(0.85));
 
 document.addEventListener('keydown', (e) => {
   if (e.key === 'Escape' && !window.LLReader.isOpen()) closeBookScene();

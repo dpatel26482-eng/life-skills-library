@@ -13,47 +13,85 @@ const PAGE_W = 1.30;      // half-spread width
 const PAGE_H = 1.80;
 const COVER_BLEED = 0.05; // covers sit slightly proud of the pages
 
-// A page carries its call-to-action printed on it, centred, like a title page.
-function pageTexture(label) {
-  const W = 700, H = 980;
-  const c = document.createElement('canvas');
-  c.width = W; c.height = H;
+// A page carries its call-to-action printed on it as a bordered plate, so it
+// reads unmistakably as something you can click rather than as body text.
+function drawPage(c, label) {
+  const W = c.width, H = c.height;
   const x = c.getContext('2d');
 
-  // Deliberately a mid warm grey, not white. The page is unlit (see below), so
-  // this value IS what lands on screen — a white fill here reads as a lightbox.
-  x.fillStyle = '#c0b49d';   // warm paper, still under the bloom threshold
-  x.fillRect(0, 0, W, H);
-  for (let i = 0; i < 9000; i++) {              // faint fibre so it isn't dead flat
+  // ---- paper ---------------------------------------------------------------
+  x.fillStyle = '#c0b49d';       // mid warm grey: the page is unlit, so this is
+  x.fillRect(0, 0, W, H);        // literally what lands on screen
+  for (let i = 0; i < 9000; i++) {
     x.fillStyle = `rgba(120,105,80,${Math.random() * 0.045})`;
     x.fillRect(Math.random() * W, Math.random() * H, 1.4, 1.4);
   }
-  // a whisper of shading toward the gutter
   const g = x.createLinearGradient(0, 0, W, 0);
   g.addColorStop(0, 'rgba(90,72,48,.16)');
   g.addColorStop(0.22, 'rgba(90,72,48,0)');
-  x.fillStyle = g; x.fillRect(0, 0, W, H);
+  x.fillStyle = g;
+  x.fillRect(0, 0, W, H);
 
-  if (label) {
-    x.textAlign = 'center';
-    x.textBaseline = 'middle';
-    x.fillStyle = '#3b2f22';
-    x.font = '400 66px Calibri, Carlito, "Segoe UI", system-ui, sans-serif';
-    x.fillText(label.text, W / 2, H / 2);
-    x.strokeStyle = 'rgba(59,47,34,.5)';
-    x.lineWidth = 2;
-    const w = x.measureText(label.text).width;
+  if (!label) return;
+
+  x.textAlign = 'center';
+  x.textBaseline = 'middle';
+
+  // ---- the button plate ----------------------------------------------------
+  const bw = W * 0.62, bh = 132;
+  const bx = (W - bw) / 2, by = H / 2 - bh / 2 - 16;
+  const r = 6;
+
+  const plate = (ox, oy, w, h, rad) => {
     x.beginPath();
-    x.moveTo(W / 2 - w / 2, H / 2 + 46);
-    x.lineTo(W / 2 + w / 2, H / 2 + 46);
-    x.stroke();
-    x.font = '400 38px Calibri, Carlito, "Segoe UI", system-ui, sans-serif';
-    x.fillStyle = 'rgba(59,47,34,.62)';
-    x.fillText(label.sub, W / 2, H / 2 + 104);
-  }
+    x.moveTo(ox + rad, oy);
+    x.arcTo(ox + w, oy, ox + w, oy + h, rad);
+    x.arcTo(ox + w, oy + h, ox, oy + h, rad);
+    x.arcTo(ox, oy + h, ox, oy, rad);
+    x.arcTo(ox, oy, ox + w, oy, rad);
+    x.closePath();
+  };
+
+  plate(bx, by, bw, bh, r);
+  x.fillStyle = 'rgba(59,47,34,.07)';         // faint ink wash inside the frame
+  x.fill();
+  x.strokeStyle = 'rgba(59,47,34,.85)';
+  x.lineWidth = 3;
+  x.stroke();
+
+  // a second hairline inset, like a printed rule
+  plate(bx + 9, by + 9, bw - 18, bh - 18, r - 2);
+  x.strokeStyle = 'rgba(59,47,34,.32)';
+  x.lineWidth = 1.5;
+  x.stroke();
+
+  // ---- label ---------------------------------------------------------------
+  x.fillStyle = '#33291d';
+  x.font = '400 62px "Instrument Serif", Georgia, "Times New Roman", serif';
+  x.letterSpacing = '2px';
+  x.fillText(label.text, W / 2, by + bh / 2 + 3);
+
+  // ---- caption below the plate --------------------------------------------
+  x.font = '400 30px Calibri, Carlito, "Segoe UI", system-ui, sans-serif';
+  x.letterSpacing = '5px';
+  x.fillStyle = 'rgba(51,41,29,.66)';
+  x.fillText(label.sub.toUpperCase(), W / 2, by + bh + 58);
+}
+
+function pageTexture(label) {
+  const c = document.createElement('canvas');
+  c.width = 700; c.height = 980;
+  drawPage(c, label);
 
   const t = new THREE.CanvasTexture(c);
   t.colorSpace = THREE.SRGBColorSpace;
+  t.anisotropy = 8;
+
+  // The serif is a webfont; if it has not arrived yet the first draw silently
+  // falls back to Georgia. Redraw once the real face is ready.
+  if (document.fonts && document.fonts.ready) {
+    document.fonts.ready.then(() => { drawPage(c, label); t.needsUpdate = true; });
+  }
   return t;
 }
 
