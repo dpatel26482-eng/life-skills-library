@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#1b2a4a">
+<meta name="description" content="A library you walk into to learn the money skills school doesn't teach — pull a book off the shelf and go.">
+<title>The Life Skills Library</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%93%9A%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<div class="stage" id="stage">
+
+  <!-- Scene 1: Entrance -->
+  <section class="scene scene-entrance active" id="scene-entrance" aria-label="Library entrance">
+    <div class="stars" aria-hidden="true"></div>
+    <div class="building-wrap">
+      <div class="building">
+        <div class="roof"></div>
+        <div class="facade">
+          <div class="column"></div>
+          <div class="window">
+            <span class="window-glow"></span>
+          </div>
+          <div class="door" id="door" role="button" tabindex="0" aria-label="Open the library door and step inside">
+            <div class="door-panel door-left"></div>
+            <div class="door-panel door-right"></div>
+            <div class="door-glow"></div>
+          </div>
+          <div class="window">
+            <span class="window-glow"></span>
+          </div>
+          <div class="column"></div>
+        </div>
+        <div class="steps">
+          <div class="step"></div>
+          <div class="step"></div>
+          <div class="step"></div>
+        </div>
+      </div>
+    </div>
+    <div class="entrance-copy">
+      <p class="eyebrow">a quiet place to learn what school skipped</p>
+      <h1>The Life Skills Library</h1>
+      <button class="btn-enter" id="btn-enter" type="button">Step Inside</button>
+      <button class="skip-link" id="skip-link" type="button">Skip intro →</button>
+    </div>
+  </section>
+
+  <!-- Scene 2: Interior -->
+  <section class="scene scene-interior" id="scene-interior" aria-label="Library interior">
+    <div class="bg-shelf bg-shelf-1" aria-hidden="true"></div>
+    <div class="bg-shelf bg-shelf-2" aria-hidden="true"></div>
+    <div class="lamp" aria-hidden="true"><span class="lamp-glow"></span></div>
+    <div class="rug" aria-hidden="true"></div>
+    <div class="interior-copy">
+      <h2>Welcome in.</h2>
+      <p>The reading table is just ahead.</p>
+      <button class="btn-continue" id="btn-continue" type="button">Continue →</button>
+    </div>
+  </section>
+
+  <!-- Scene 3: Library main / bookshelf -->
+  <section class="scene scene-library" id="scene-library" aria-label="Reading table and bookshelf">
+    <header class="library-header">
+      <p class="eyebrow">money &amp; finance</p>
+      <h1>The Life Skills Library</h1>
+      <p class="library-intro">
+        Most schools spend years teaching algebra and essay structure, but never sit you down to explain how credit works, why a paycheck is smaller than you expect, or how one missed bill can snowball into real trouble. That gap is normal — and it's fixable. Pull a book off the shelf below, and get the money knowledge nobody assigned as homework.
+      </p>
+      <p class="progress-line" id="progress-line">0 of 5 books read</p>
+    </header>
+
+    <div class="table-scene">
+      <div class="shelf-unit">
+        <div class="shelf-backboard" aria-hidden="true"></div>
+        <ol class="shelf-row" id="shelf-row"></ol>
+        <div class="shelf-plank" aria-hidden="true"></div>
+      </div>
+      <div class="table-top" aria-hidden="true"></div>
+      <div class="table-front" aria-hidden="true"></div>
+    </div>
+  </section>
+
+  <!-- Book reading overlay -->
+  <div class="book-overlay" id="book-overlay" aria-hidden="true">
+    <div class="book-backdrop" id="book-backdrop"></div>
+    <div class="book-reader" role="dialog" aria-modal="true" aria-labelledby="reader-title">
+      <button class="book-close" id="book-close" type="button" aria-label="Close book">×</button>
+      <header class="reader-header">
+        <span class="reader-icon" id="reader-icon" aria-hidden="true"></span>
+        <h2 id="reader-title"></h2>
+        <span class="reader-badge" id="reader-badge" hidden>✓ Read</span>
+      </header>
+      <div class="reader-page" id="reader-page"></div>
+      <footer class="reader-footer">
+        <button class="reader-nav" id="reader-prev" type="button">← Back</button>
+        <div class="reader-dots" id="reader-dots" aria-hidden="true"></div>
+        <button class="reader-nav primary" id="reader-next" type="button">Next →</button>
+      </footer>
+    </div>
+  </div>
+
+</div>
+<script src="script.js"></script>
+</body>
+</html>

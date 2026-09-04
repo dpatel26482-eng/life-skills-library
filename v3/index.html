@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en-AU">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#050505">
+<meta name="description" content="The Late Library — three short, honest guides on budgeting, tax and superannuation for young Australians.">
+<title>Learning Common Life Skill Guide</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%93%9A%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Spectral:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Work+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css?v=4">
+<link rel="stylesheet" href="world.css?v=35">
+<script type="importmap">
+{
+  "imports": {
+    "three": "./vendor/three/three.module.js",
+    "three/addons/": "./vendor/three/addons/",
+    "lenis": "./vendor/lenis/lenis.mjs"
+  }
+}
+</script>
+</head>
+<body class="v3">
+
+<!-- the WebGL stage sits fixed behind everything -->
+<canvas id="stage-canvas"></canvas>
+
+<div class="loader" id="loader"><span class="loader-mark">Opening the library</span></div>
+
+<nav class="glass glass-pill site-nav v3-nav" id="site-nav">
+  <button class="wordmark" type="button" data-seek="0">Home Screen</button>
+  <div class="nav-links">
+    <button type="button" data-seek="0.62">The reading room (guide)</button>
+    <button type="button" id="open-letter">Why it matters</button>
+  </div>
+</nav>
+
+<!-- Scroll-pinned copy. Each panel is held by the scroll position, era-residence style. -->
+<main class="scroll-track" id="scroll-track">
+
+  <section class="panel panel--hero" data-panel="hero">
+    <div class="panel-inner">
+      <h1 class="hero-headline">Learning Common<br>Life Skill <em>Guide</em></h1>
+      <p class="kicker hero-kicker">Learn Budgeting &middot; Tax &middot; Superannuation</p>
+      <p class="hero-subtitle" id="hero-subtitle"><!-- reserved for future copy --></p>
+      <p class="scroll-cue"><span class="scroll-cue-line"></span>Scroll to walk in</p>
+    </div>
+  </section>
+
+  <section class="panel panel--mid" data-panel="mid">
+    <div class="panel-inner">
+      <h2 class="mid-line">Nobody sat you down<br>and <em>explained</em> it.</h2>
+    </div>
+  </section>
+
+  <section class="panel panel--mid" data-panel="mid2">
+    <div class="panel-inner">
+      <h2 class="mid-line">So learn it <em>now</em>.</h2>
+    </div>
+  </section>
+
+  <section class="panel panel--shelf" data-panel="shelf">
+    <aside class="glass glass-panel shelf-panel v3-shelf-panel">
+      <p class="kicker">The reading room</p>
+      <h2>Three Books Are <em>Lit</em>.</h2>
+      <p class="shelf-instruction">Drag to look around the shelf. Click to pull a book to learn about a topic.</p>
+      <ul class="book-list" id="book-list"></ul>
+    </aside>
+  </section>
+
+</main>
+
+<p class="hover-label" id="hover-label" hidden></p>
+
+<!-- kept for state only: the Explore / Go back words are printed on the pages -->
+<div class="book-hud" id="book-hud" aria-hidden="true"></div>
+
+<!-- ================= LETTER OVERLAY ================= -->
+<div class="overlay letter-overlay" id="letter-overlay" aria-hidden="true">
+  <div class="overlay-backdrop" data-close-letter></div>
+  <div class="glass letter-sheet" role="dialog" aria-modal="true" aria-labelledby="letter-title">
+    <button class="overlay-close" type="button" data-close-letter aria-label="Close">&times;</button>
+    <p class="kicker">The gap</p>
+    <h2 id="letter-title">You&rsquo;re Already Inside These Systems.</h2>
+    <div class="letter-columns">
+      <div>
+        <h3>Already in the system</h3>
+        <p>A fifteen-year-old with a casual job already has a Tax File Number, a super account accruing contributions, and &mdash; depending on hours and pay &mdash; a tax return due each year. None of that waits for a &ldquo;financial literacy&rdquo; unit to appear on a timetable.</p>
+      </div>
+      <div>
+        <h3>Examined vs. real</h3>
+        <p>School teaches what gets examined. Budgeting, tax brackets and the super guarantee don&rsquo;t appear on a test &mdash; so they don&rsquo;t get taught &mdash; but they are still examined by real life, every payslip, every year.</p>
+      </div>
+      <div>
+        <h3>Exposure, not intelligence</h3>
+        <p>None of this is hard. A bracket is just a slice. A budget is just a plan. The gap isn&rsquo;t difficulty &mdash; it&rsquo;s that almost nobody is shown it once, clearly, before they need it.</p>
+      </div>
+      <div>
+        <h3>It runs either way</h3>
+        <p>These systems don&rsquo;t pause while you catch up. Tax is withheld on your next shift whether you&rsquo;ve read a payslip or not. Super compounds &mdash; or doesn&rsquo;t &mdash; from your first contribution, not your first lesson.</p>
+      </div>
+    </div>
+    <div class="letter-stats">
+      <div class="stat-card"><p class="stat-value">$18,200</p><p class="stat-label">Tax-free threshold</p></div>
+      <div class="stat-card"><p class="stat-value">12%</p><p class="stat-label">Employer super guarantee, paid on top of your wage</p></div>
+      <div class="stat-card"><p class="stat-value">Age 60</p><p class="stat-label">Preservation age for most people today</p></div>
+    </div>
+    <button class="btn-solid" type="button" id="letter-to-shelf">Take me to the shelf</button>
+  </div>
+</div>
+
+<!-- ================= BOOK READER ================= -->
+<div class="overlay book-overlay" id="book-overlay" aria-hidden="true">
+  <div class="overlay-backdrop" id="book-backdrop"></div>
+  <div class="glass book-reader" id="book-reader" role="dialog" aria-modal="true" aria-labelledby="reader-title">
+    <header class="reader-header">
+      <div class="reader-heading">
+        <p class="reader-eyebrow" id="reader-eyebrow"></p>
+        <h2 id="reader-title"></h2>
+      </div>
+      <button class="reader-shelve" id="reader-shelve" type="button">Shelve it <span class="keycap">Esc</span></button>
+    </header>
+
+    <nav class="chapter-tabs" id="chapter-tabs" aria-label="Chapters"></nav>
+
+    <div class="spread-wrap">
+      <div class="spread" id="spread">
+        <div class="page page-left" id="page-left"></div>
+        <div class="page page-right" id="page-right"></div>
+        <div class="leaf" id="leaf" aria-hidden="true">
+          <div class="leaf-face leaf-front" id="leaf-front"></div>
+          <div class="leaf-face leaf-back" id="leaf-back"></div>
+        </div>
+      </div>
+    </div>
+
+    <footer class="reader-footer">
+      <button class="reader-nav" id="reader-back" type="button">&larr; Back</button>
+      <p class="reader-position" id="reader-position"></p>
+      <button class="reader-nav primary" id="reader-forward" type="button">Turn the page &rarr;</button>
+    </footer>
+  </div>
+</div>
+
+<script src="books-data.js?v=5"></script>
+<script src="reader.js?v=35"></script>
+<script type="module" src="world.js?v=35"></script>
+</body>
+</html>

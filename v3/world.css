@@ -1,0 +1,202 @@
+/* v3 — the WebGL stage plus the scroll-pinned copy that rides over it.
+   Palette, glass and reader styling are inherited from ../styles.css. */
+
+html, body.v3 {
+  height: auto;
+  overflow: visible;          /* Lenis needs a real scrollable document */
+  background: #050505;
+}
+body.v3 { overscroll-behavior-y: none; }
+body.v3.is-pointing { cursor: pointer; }
+
+#stage-canvas {
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100vh;
+  display: block;
+  z-index: 0;
+  touch-action: none;
+}
+
+/* ------------------------------------------------------------------ loader */
+.loader {
+  position: fixed; inset: 0; z-index: 40;
+  display: grid; place-items: center;
+  background: #050505;
+  transition: opacity .9s ease, visibility .9s;
+}
+.loader.is-gone { opacity: 0; visibility: hidden; pointer-events: none; }
+.loader-mark {
+  font-family: var(--font-display); font-size: 1.5rem;
+  color: var(--gold-soft); letter-spacing: .02em;
+  animation: loader-breathe 2.4s ease-in-out infinite;
+}
+@keyframes loader-breathe { 0%,100% { opacity: .45; } 50% { opacity: 1; } }
+
+/* ------------------------------------------------------------------- chrome */
+.v3-nav { position: fixed; z-index: 20; }
+
+/* Home Screen sits in the same typeface and weight as the other menu items
+   rather than the serif wordmark it inherited. */
+.v3-nav .wordmark {
+  font-family: var(--font-ui);
+  font-size: .82rem;
+  padding: .5rem .85rem;
+  border-radius: 999px;
+  color: rgba(247,239,224,.62);
+  transition: color .25s ease, background .25s ease;
+}
+.v3-nav .wordmark:hover { color: var(--cream); background: rgba(255,255,255,.07); }
+.v3-nav .wordmark.is-current { color: var(--gold-soft); }
+
+/* --------------------------------------------------------- scrolling track */
+/* Each panel is a viewport-tall slot; the copy inside is pinned and fades
+   in and out across its own slice of the scroll. */
+.scroll-track { position: relative; z-index: 10; pointer-events: none; }
+.panel {
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  pointer-events: none;
+}
+.panel-inner {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 0 clamp(1.5rem, 7vw, 7rem);
+  max-width: 62rem;
+  animation: panel-cycle linear both;
+  animation-timeline: view();
+  animation-range: entry 0% exit 100%;
+}
+/* Browsers without scroll-driven animation still get a readable, static panel. */
+@supports not (animation-timeline: view()) {
+  .panel-inner { animation: none; }
+}
+@keyframes panel-cycle {
+  0%   { opacity: 0; transform: translateY(42px); }
+  22%  { opacity: 1; transform: translateY(0); }
+  70%  { opacity: 1; transform: translateY(0); }
+  100% { opacity: 0; transform: translateY(-42px); }
+}
+
+.panel-inner > * { pointer-events: auto; }
+
+.panel--hero .hero-headline { margin-bottom: 1.1rem; }
+/* the topic line now reads under the title, not over it */
+.hero-kicker { margin: 0 0 1.2rem; }
+.mid-line {
+  font-family: var(--font-display);
+  font-size: clamp(2.4rem, 6vw, 5rem);
+  line-height: 1.06;
+  letter-spacing: -.015em;
+  text-shadow: 0 6px 44px rgba(0,0,0,.8);
+  max-width: 18ch;
+}
+
+.scroll-cue {
+  margin-top: 3rem;
+  display: flex; align-items: center; gap: .9rem;
+  font-family: var(--font-ui); font-size: .68rem;
+  letter-spacing: .24em; text-transform: uppercase;
+  color: rgba(247,239,224,.42);
+}
+.scroll-cue-line {
+  width: 54px; height: 1px;
+  background: linear-gradient(90deg, var(--gold), transparent);
+}
+
+/* ------------------------------------------------------------- shelf panel */
+.panel--shelf { align-items: center; justify-content: flex-end; }
+.v3-shelf-panel {
+  position: sticky;
+  top: 50%;
+  transform: translateY(-50%);
+  margin-right: clamp(1.5rem, 5vw, 5rem);
+  pointer-events: auto;
+  width: min(24rem, 90vw);
+}
+
+/* ------------------------------------------------------------ hover label */
+.hover-label {
+  position: fixed; left: 0; top: 0; z-index: 25;
+  margin: 0; padding: .34rem .7rem;
+  border: 1px solid rgba(240,200,119,.4);
+  border-radius: 999px;
+  background: rgba(8,7,6,.82);
+  backdrop-filter: blur(8px);
+  font-family: var(--font-ui); font-size: .68rem; font-weight: 600;
+  letter-spacing: .12em; text-transform: uppercase;
+  color: var(--gold-soft);
+  pointer-events: none;
+  white-space: nowrap;
+}
+
+/* the reader sits above the canvas */
+.overlay { z-index: 30; }
+
+@media (max-width: 760px) {
+  .mid-line { font-size: clamp(2rem, 8vw, 2.8rem); }
+  .v3-shelf-panel { margin: 0 auto; width: min(22rem, 92vw); }
+}
+
+
+/* ------------------------------------------------------- open-book HUD */
+.book-hud {
+  position: fixed; inset: 0; z-index: 22;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity .5s ease;
+  font-family: var(--font-display);
+}
+.book-hud.is-on { opacity: 1; }
+.book-hud button {
+  position: absolute; left: 50%; transform: translateX(-50%);
+  background: none; border: none; cursor: pointer;
+  pointer-events: auto;
+  font-family: var(--font-display);
+  font-size: 1.5rem; font-style: italic;
+  color: var(--cream);
+  text-shadow: 0 2px 18px rgba(0,0,0,.9);
+  padding: .4rem 1rem;
+  transition: color .25s ease, transform .25s ease;
+}
+.book-hud button:hover { color: var(--gold-soft); }
+.book-hud .hud-explore { top: 6vh; }
+.book-hud .hud-back { bottom: 6vh; }
+.book-hud .hud-mark { display: block; font-size: 1.1rem; opacity: .8; }
+
+
+/* While a book is open the pinned scroll copy would read straight through the
+   pages, so it steps out of the way. */
+body.is-reading .scroll-track { opacity: 0; transition: opacity .45s ease; }
+.scroll-track { transition: opacity .45s ease; }
+
+
+/* ------------------------------------------------- side-panel topic links */
+.book-list { list-style: none; margin: .2rem 0 0; padding: 0; display: grid; gap: .1rem; }
+.topic-link {
+  display: flex; align-items: baseline; gap: .7rem;
+  width: 100%;
+  background: none; border: none; cursor: pointer;
+  padding: .6rem .2rem;
+  font-family: Calibri, Carlito, "Segoe UI", system-ui, sans-serif;
+  font-size: 1rem;
+  color: rgba(247,239,224,.78);
+  text-align: left;
+  border-bottom: 1px solid rgba(255,255,255,.07);
+  transition: color .22s ease, padding-left .22s ease;
+}
+.topic-link:hover { color: var(--gold-soft); padding-left: .55rem; }
+.topic-num {
+  font-family: var(--font-display);
+  font-size: .82rem; color: var(--gold);
+  min-width: 1.6rem;
+}
+
+/* the guide reader and the book use Calibri */
+.book-reader, .book-reader .page, .shelf-instruction { font-family: Calibri, Carlito, "Segoe UI", system-ui, sans-serif; }

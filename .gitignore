@@ -1,0 +1,15 @@
+# Libraries are vendored into v3/vendor/, so node_modules is only used locally
+node_modules/
+
+# Generated output — v3/ is deployed directly, no build step
+deploy/
+dist/
+
+# Vercel project link (machine-specific)
+.vercel/
+
+# Generated stills for the older v2 page; large and not used by v3
+media/
+
+# macOS
+.DS_Store
