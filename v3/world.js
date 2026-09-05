@@ -503,16 +503,9 @@ canvas.addEventListener('pointerup', (e) => {
 canvas.addEventListener('click', (e) => {
   updatePointerFromEvent(e);
 
-  // While a book is open its two pages are the buttons.
-  if (reading && reading.phase === 'read') {
-    raycaster.setFromCamera(ndc, camera);
-    const hits = raycaster.intersectObjects([reading.rig.rightPage, reading.rig.leftPage], false);
-    if (hits.length) {
-      if (hits[0].object === reading.rig.rightPage) window.LLReader.open(reading.mesh.userData.id);
-      else closeBookScene();
-    }
-    return;
-  }
+  // Nothing on the shelf is clickable while a book is out — the guide is the
+  // only thing you can act on, and it has its own controls.
+  if (reading) return;
 
   const hit = pickAt();
   if (hit) pullBook(hit);
@@ -674,8 +667,11 @@ function placeOpenBook(e) {
   r.rig.group.quaternion.identity();
 }
 
-// shelving the HTML reader returns to the 3D book, still open
-window.addEventListener('ll-reader-closed', () => {});
+// Shelving the guide puts the book back and returns you to the reading room,
+// rather than dropping you onto the open book with nothing left to do there.
+window.addEventListener('ll-reader-closed', () => {
+  if (reading && reading.phase === 'read') closeBookScene();
+});
 
 // =============================================================================
 //  LOOP

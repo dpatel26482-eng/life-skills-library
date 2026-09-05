@@ -136,8 +136,10 @@ export function makeBook({ title, numeral, colour = 0x6d2f34 }) {
     m.toneMapped = false;
     return m;
   };
-  const rightPageMat = mkPage({ text: 'Explore', sub: 'read the guide' });
-  const leftPageMat = mkPage({ text: 'Go back', sub: 'return to the shelf' });
+  // Plain paper. The guide opens over the book on its own, so printed buttons
+  // were affordances for something that no longer needs asking.
+  const rightPageMat = mkPage(null);
+  const leftPageMat = mkPage(null);
   const pageMat = rightPageMat;
   // Muted toward leather: at full saturation the spine showing in the gutter
   // reads as a bright plastic band next to the paper.
