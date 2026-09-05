@@ -629,6 +629,16 @@ function updateReading(dt) {
       r.phase = 'read';
       hud.classList.add('is-on');
       hud.setAttribute('aria-hidden', 'false');
+
+      // The guide opens by itself once the book has finished opening — no second
+      // click. Held back a beat so the book is actually seen opening rather than
+      // being covered the instant it lands. "Explore" still works if the guide is
+      // closed and you want it back.
+      setTimeout(() => {
+        if (reading && reading.phase === 'read' && !window.LLReader.isOpen()) {
+          window.LLReader.open(r.mesh.userData.id);
+        }
+      }, 380);
     } else {
       readingLight.intensity = 0;
       r.rig.group.visible = false;
