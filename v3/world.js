@@ -19,9 +19,9 @@ import { ShaderPass } from 'three/addons/postprocessing/ShaderPass.js';
 import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
 import { RGBELoader } from 'three/addons/loaders/RGBELoader.js';
 import Lenis from 'lenis';
-import { pbr, enableAO, manager } from './materials.js';
-import { buildRotunda, loadProps, ROT_R, ROT_H } from './rotunda.js';
-import { makeBook } from './book.js';
+import { pbr, enableAO, manager } from './materials.js?v=45';
+import { buildRotunda, loadProps, ROT_R, ROT_H } from './rotunda.js?v=45';
+import { makeBook } from './book.js?v=45';
 
 const GOLD = 0xf0c877;
 const LAMP = 0xffcf8a;
@@ -670,8 +670,14 @@ function placeOpenBook(e) {
 // Shelving the guide puts the book back and returns you to the reading room,
 // rather than dropping you onto the open book with nothing left to do there.
 window.addEventListener('ll-reader-closed', () => {
+  lenis.start();                       // hand the wheel back to the page
   if (reading && reading.phase === 'read') closeBookScene();
 });
+
+// Lenis listens for wheel on the window, so while the guide is open it swallows
+// the wheel before the page's own scroll container ever sees it — which is why
+// only the arrow keys worked. Park it for the duration.
+window.addEventListener('ll-reader-opened', () => lenis.stop());
 
 // =============================================================================
 //  LOOP

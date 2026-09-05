@@ -308,7 +308,6 @@ body.is-reading .scroll-track { opacity: 0; transition: opacity .45s ease; }
    leaf overlaps by a pixel so there is no gap to see. */
 .book-reader .spread { background: var(--parchment-dim); border-radius: 16px; }
 .book-reader .leaf {
-  width: calc(50% + 1px);
   will-change: transform;
 }
 .book-reader .leaf-face {
@@ -318,3 +317,48 @@ body.is-reading .scroll-track { opacity: 0; transition: opacity .45s ease; }
   transform: translateZ(0);                 /* own layer: stops repaint tearing */
 }
 .book-reader .leaf-back { border-radius: 16px 0 0 16px; }
+
+
+/* ---- type: one family for chrome and page furniture --------------------
+   Buttons and page headings now match the book title. Body copy stays in the
+   reading serif so long passages remain comfortable. */
+.book-reader .reader-nav,
+.book-reader .reader-shelve,
+.book-reader .chapter-tab {
+  font-family: Calibri, Carlito, "Segoe UI", system-ui, sans-serif;
+  font-weight: 600;
+  letter-spacing: .01em;
+}
+.book-reader .reader-nav { font-size: .92rem; }
+.book-reader .reader-shelve { font-size: .84rem; }
+
+.book-reader .page h3,
+.book-reader .leaf-face h3,
+.book-reader .page-kicker,
+.book-reader .barchart-caption,
+.book-reader .data-table th,
+.book-reader .glossary-term,
+.book-reader .splitbar-legend,
+.book-reader .question-prompt {
+  font-family: Calibri, Carlito, "Segoe UI", system-ui, sans-serif;
+}
+.book-reader .page h3,
+.book-reader .leaf-face h3 { font-weight: 600; letter-spacing: .005em; }
+
+/* another step down on page copy */
+.book-reader .page,
+.book-reader .leaf-face { font-size: .8rem; line-height: 1.6; }
+.book-reader .page p,
+.book-reader .leaf-face p { font-size: .8rem; }
+.book-reader .page h3,
+.book-reader .leaf-face h3 { font-size: 1.02rem; }
+.book-reader .data-table { font-size: .75rem; }
+.book-reader .page-kicker { font-size: .58rem; }
+.book-reader .pullquote { font-size: .92rem; }
+.book-reader .numbered-list,
+.book-reader .toolkit-list,
+.book-reader .glossary-list { font-size: .78rem; }
+
+/* the pages are their own scroll containers; Lenis must keep its hands off them
+   or the wheel is swallowed by the page-level smooth scrolling */
+.book-reader .page { overscroll-behavior: contain; }

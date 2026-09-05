@@ -131,7 +131,7 @@
     currentBook = book;
     spreadIndex = 0;
 
-    readerEyebrow.textContent = 'Book ' + book.number + ' · ' + book.tagline;
+    readerEyebrow.textContent = 'Book ' + book.number;
     readerTitle.textContent = book.title;
     renderTabs();
     renderSpread();
@@ -139,6 +139,7 @@
     overlay.classList.add('is-open');
     overlay.setAttribute('aria-hidden', 'false');
     $('reader-shelve').focus();
+    window.dispatchEvent(new CustomEvent('ll-reader-opened'));
   }
 
   function closeBook() {

@@ -8,7 +8,7 @@
 
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
-import { pbr, enableAO, box, spineLabel, glowSprite, manager } from './materials.js';
+import { pbr, enableAO, box, spineLabel, glowSprite, manager } from './materials.js?v=45';
 
 export const ROT_R = 16.5;      // drum radius
 export const ROT_H = 14;        // drum height
