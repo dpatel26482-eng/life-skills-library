@@ -13,3 +13,6 @@ media/
 
 # macOS
 .DS_Store
+
+# Local archive of every past design (see versions/index.html)
+versions/
