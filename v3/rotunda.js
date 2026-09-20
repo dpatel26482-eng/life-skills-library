@@ -8,7 +8,7 @@
 
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
-import { pbr, enableAO, box, spineLabel, glowSprite, manager } from './materials.js?v=49';
+import { pbr, enableAO, box, spineLabel, glowSprite, manager } from './materials.js?v=50';
 
 export const ROT_R = 16.5;      // drum radius
 export const ROT_H = 14;        // drum height
@@ -156,6 +156,9 @@ export function buildRotunda(centreZ) {
     if (spines.instanceColor) spines.instanceColor.needsUpdate = true;
   }
   spines.castShadow = true;
+  // Hit testing an InstancedMesh tests every instance. These are decorative, and
+  // the shelving behind them answers the same question far more cheaply.
+  spines.raycast = function () {};
   island.add(spines);
 
   // ------------------------------------------------------------- fireplace --
@@ -284,6 +287,7 @@ export function buildRotunda(centreZ) {
     if (stacks.instanceColor) stacks.instanceColor.needsUpdate = true;
   }
   stacks.castShadow = stacks.receiveShadow = true;
+  stacks.raycast = function () {};
   g.add(stacks);
 
   // ------------------------------------------------------------ ambient --

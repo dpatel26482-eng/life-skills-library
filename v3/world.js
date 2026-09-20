@@ -19,9 +19,9 @@ import { ShaderPass } from 'three/addons/postprocessing/ShaderPass.js';
 import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
 import { RGBELoader } from 'three/addons/loaders/RGBELoader.js';
 import Lenis from 'lenis';
-import { pbr, enableAO, manager } from './materials.js?v=49';
-import { buildRotunda, loadProps, ROT_R, ROT_H } from './rotunda.js?v=49';
-import { makeBook } from './book.js?v=49';
+import { pbr, enableAO, manager } from './materials.js?v=50';
+import { buildRotunda, loadProps, ROT_R, ROT_H } from './rotunda.js?v=50';
+import { makeBook } from './book.js?v=50';
 
 const GOLD = 0xf0c877;
 const LAMP = 0xffcf8a;
@@ -360,7 +360,6 @@ let scrollProgress = 0;            // 0..1 damped
 let scrollRaw = 0;
 let pointer = { x: 0, y: 0 };      // -1..1, look-around / orbit offset
 let dragging = false, dragX = 0, dragY = 0;
-let lastOverShelf = false;
 let inRoom = false;          // drives the side panel's visibility
 let pointerHoming = false;   // easing drag offset back to centre after a focus
 
@@ -422,6 +421,8 @@ function seek(p) {
   lenis.scrollTo(p * limit, { duration: 1.6 });
 }
 
+let pendingOpen = null;      // book to pull once the camera arrives
+
 // Swing the camera round the island until it is square on to a given book.
 function focusBook(id) {
   const mesh = pickable.find((m) => m.userData.id === id);
@@ -441,7 +442,18 @@ function focusBook(id) {
   // Drag offset is added straight onto the orbit angle, so accumulated dragging
   // threw the result off. Ease it back to zero as we travel.
   pointerHoming = true;
-  seek(SHELF_START + t * (1 - SHELF_START));
+  const target = SHELF_START + t * (1 - SHELF_START);
+  seek(target);
+  return target;
+}
+
+// Used by the side panel: travel round to the book, then pull it off the shelf
+// once the camera has actually settled there.
+function travelAndOpen(id) {
+  if (reading) return;
+  const target = focusBook(id);
+  if (target === undefined) return;
+  pendingOpen = { id: id, target: target, since: performance.now() };
 }
 
 // ------------------------------------------------------------------ picking --
@@ -454,11 +466,19 @@ function updatePointerFromEvent(e) {
   ndc.y = -(e.clientY / window.innerHeight) * 2 + 1;
 }
 
-// True when the cursor is over the island. Used to hold the view still so a
-// book can be aimed at without the room turning under the cursor.
-function overIsland() {
+// One raycast answering both questions at once: is the cursor over the unit,
+// and is it over a lit book. Previously these were two separate recursive casts
+// run on every pointermove, which cost about a millisecond each — at a 90Hz
+// mouse that is a tenth of the main thread spent on hit testing alone.
+let onShelf = false;
+let pickDirty = false;
+const parallaxTarget = { x: 0, y: 0 };
+
+function castOnce() {
   raycaster.setFromCamera(ndc, camera);
-  return raycaster.intersectObject(rot.island, true).length > 0;
+  const hits = raycaster.intersectObjects([rot.island].concat(pickable), true);
+  const first = hits.length ? hits[0].object : null;
+  return { over: !!first, book: first && pickable.indexOf(first) !== -1 ? first : null };
 }
 
 function pickAt() {
@@ -494,23 +514,15 @@ window.addEventListener('pointermove', (e) => {
     pointer.y = THREE.MathUtils.clamp(pointer.y + (e.clientY - dragY) * 0.0032, -0.7, 0.7);
     dragX = e.clientX; dragY = e.clientY;
   } else if (scrollProgress > SHELF_START) {
-    // Parallax follows the cursor, except over the bookcase itself: aiming at a
-    // spine should not swing the room away from under you. Dragging still turns
-    // the view deliberately.
-    var onShelf = overIsland();
-    if (onShelf !== lastOverShelf) {
-      lastOverShelf = onShelf;
-      document.body.classList.toggle('is-over-shelf', onShelf);
-    }
-    if (!onShelf) {
-      pointer.x += ((e.clientX / window.innerWidth - 0.5) * 0.85 - pointer.x) * 0.06;
-      pointer.y += ((0.5 - e.clientY / window.innerHeight) * 0.4 - pointer.y) * 0.06;
-    }
+    // Record where the cursor wants the view; the raycast and the easing both
+    // happen once per frame in render() rather than once per mouse event.
+    parallaxTarget.x = (e.clientX / window.innerWidth - 0.5) * 0.85;
+    parallaxTarget.y = (0.5 - e.clientY / window.innerHeight) * 0.4;
+    pickDirty = true;
   }
   if (hoverLabel && !hoverLabel.hidden) {
     hoverLabel.style.transform = `translate(${e.clientX + 16}px, ${e.clientY - 10}px)`;
   }
-  setHover(!reading && scrollProgress > SHELF_START - 0.05 ? pickAt() : null);
 });
 
 canvas.addEventListener('pointerdown', (e) => { pointerHoming = false; dragging = true; dragX = e.clientX; dragY = e.clientY; canvas.setPointerCapture(e.pointerId); });
@@ -721,6 +733,39 @@ function render() {
   // The panel used to be sticky inside a one-screen section, so once the orbit
   // scrolled past that section it slid away. It is fixed now and simply shown
   // for as long as the camera is in the room.
+  if (pendingOpen && !reading) {
+    // wait for the camera to arrive, with a ceiling so a stalled scroll still opens
+    const arrived = Math.abs(scrollProgress - pendingOpen.target) < 0.012;
+    if (arrived || performance.now() - pendingOpen.since > 2600) {
+      const id = pendingOpen.id;
+      pendingOpen = null;
+      pullBook(pickable.find((m) => m.userData.id === id));
+    }
+  }
+
+  if (pickDirty) {
+    pickDirty = false;
+    if (!reading && scrollProgress > SHELF_START - 0.05) {
+      const r = castOnce();
+      setHover(r.book);
+      if (r.over !== onShelf) {
+        onShelf = r.over;
+        document.body.classList.toggle('is-over-shelf', onShelf);
+      }
+    } else if (hovered || onShelf) {
+      setHover(null);
+      onShelf = false;
+      document.body.classList.remove('is-over-shelf');
+    }
+  }
+
+  // Parallax eases toward the cursor, but holds still over the bookcase so a
+  // spine can be aimed at without the room turning out from under it.
+  if (!dragging && !onShelf && !reading && scrollProgress > SHELF_START) {
+    pointer.x += (parallaxTarget.x - pointer.x) * 0.06;
+    pointer.y += (parallaxTarget.y - pointer.y) * 0.06;
+  }
+
   var nowInRoom = scrollProgress > SHELF_START - 0.06;
   if (nowInRoom !== inRoom) {
     inRoom = nowInRoom;
@@ -812,7 +857,7 @@ if (topicList) {
   ).join('');
   topicList.addEventListener('click', (e) => {
     const btn = e.target.closest('.topic-link');
-    if (btn) focusBook(btn.dataset.id);
+    if (btn) travelAndOpen(btn.dataset.id);
   });
 }
 
