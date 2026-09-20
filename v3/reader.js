@@ -91,6 +91,118 @@
       '</div>';
   }
 
+
+  // ---------- scenario, resource link, written answer ----------
+
+  function renderScenario(b) {
+    var facts = (b.facts || []).map(function (f) {
+      return '<div class="ledger-row' + (f.isTotal ? ' is-total' : '') + '"><span>' + f.label + '</span><span>' + f.value + '</span></div>';
+    }).join('');
+    return '<p class="page-kicker">' + (b.kicker || 'Scenario') + '</p><h3>' + b.heading + '</h3>' +
+      '<div class="scenario-card">' +
+        b.paragraphs.map(function (p) { return '<p>' + p + '</p>'; }).join('') +
+        (facts ? '<div class="ledger scenario-facts">' + facts + '</div>' : '') +
+      '</div>';
+  }
+
+  function renderResource(b) {
+    return '<p class="page-kicker">' + (b.kicker || 'Template') + '</p><h3>' + b.heading + '</h3>' +
+      '<p>' + b.body + '</p>' +
+      '<a class="resource-link" href="' + b.href + '" target="_blank" rel="noopener noreferrer">' +
+        '<span class="resource-icon" aria-hidden="true">&#8599;</span>' +
+        '<span class="resource-text"><span class="resource-title">' + b.linkText + '</span>' +
+        '<span class="resource-sub">' + b.linkSub + '</span></span>' +
+      '</a>';
+  }
+
+  function renderWritten(b, side) {
+    return '' +
+      '<div class="written-block" data-side="' + side + '">' +
+        '<p class="page-kicker">Write your answer</p>' +
+        '<p class="question-prompt">' + b.prompt + '</p>' +
+        (b.hint ? '<p class="written-hint">' + b.hint + '</p>' : '') +
+        '<textarea class="written-input" rows="6" spellcheck="true" ' +
+          'placeholder="Write a few sentences in your own words&hellip;"></textarea>' +
+        '<button type="button" class="written-check">Compare with the example</button>' +
+        '<div class="written-result" hidden></div>' +
+      '</div>';
+  }
+
+  // ---------- similarity marking ----------
+  // Compares the wording of an answer against a sample answer. It measures
+  // overlap, not correctness — a good answer phrased differently will score
+  // lower, which is why the example and the missed ideas are always shown.
+
+  var STOPWORDS = ('a an and are as at be because been but by can could do does for from had has have how i if in into is it its just like may more most much must of on or over own she he they them their there this that the to too under until up very was way we were what when where which while who why will with would your you').split(' ');
+  var STOP = {};
+  for (var si = 0; si < STOPWORDS.length; si++) STOP[STOPWORDS[si]] = true;
+
+  function stem(w) { return w.replace(/(ings|ing|ies|ed|es|s)$/, ''); }
+
+  function contentWords(text) {
+    return String(text).toLowerCase()
+      .replace(/[^a-z0-9\s']/g, ' ')
+      .split(/\s+/)
+      .filter(function (w) { return w.length > 2 && !STOP[w]; })
+      .map(stem);
+  }
+
+  function uniq(list) {
+    var seen = {}, out = [];
+    for (var i = 0; i < list.length; i++) if (!seen[list[i]]) { seen[list[i]] = 1; out.push(list[i]); }
+    return out;
+  }
+
+  function bigrams(list) {
+    var out = [];
+    for (var i = 0; i < list.length - 1; i++) out.push(list[i] + ' ' + list[i + 1]);
+    return out;
+  }
+
+  function scoreAnswer(response, block) {
+    var respWords = contentWords(response);
+    var respSet = {};
+    for (var i = 0; i < respWords.length; i++) respSet[respWords[i]] = true;
+
+    // The author's keywords are the ideas that matter; fall back to the example.
+    var ideas = block.keywords && block.keywords.length ? block.keywords : uniq(contentWords(block.example));
+    var hit = [], missed = [];
+    for (var k = 0; k < ideas.length; k++) {
+      // An idea may list synonyms separated by "|" — a correct answer in the
+      // reader's own words should not be marked down for choosing a different
+      // word for the same thing.
+      var alts = String(ideas[k]).split('|');
+      var present = false;
+      for (var a = 0; a < alts.length && !present; a++) {
+        var terms = contentWords(alts[a]);
+        present = terms.length > 0 && terms.every(function (t) { return respSet[t]; });
+      }
+      (present ? hit : missed).push(alts[0]);
+    }
+    var recall = ideas.length ? hit.length / ideas.length : 0;
+
+    // a little credit for phrasing, so lifting whole phrases reads as closer
+    var rb = bigrams(respWords), eb = bigrams(uniq(contentWords(block.example)));
+    var ebSet = {};
+    for (var e = 0; e < eb.length; e++) ebSet[eb[e]] = true;
+    var shared = 0;
+    for (var r = 0; r < rb.length; r++) if (ebSet[rb[r]]) shared++;
+    var phrasing = rb.length ? Math.min(1, shared / Math.max(6, eb.length * 0.4)) : 0;
+
+    var pct = Math.round(100 * (0.78 * recall + 0.22 * phrasing));
+
+    // a two-word answer should never look like a strong match
+    if (respWords.length < 8) pct = Math.min(pct, 25);
+    return { pct: Math.max(0, Math.min(100, pct)), hit: hit, missed: missed, tooShort: respWords.length < 8 };
+  }
+
+  function bandFor(pct) {
+    if (pct >= 75) return 'Very close to the example';
+    if (pct >= 50) return 'Covers most of the key ideas';
+    if (pct >= 30) return 'Partly there';
+    return 'Quite different from the example';
+  }
+
   function renderBlock(block, side) {
     switch (block.type) {
       case 'prose': return renderProse(block);
@@ -102,6 +214,9 @@
       case 'toolkit': return renderToolkit(block);
       case 'glossary': return renderGlossary(block);
       case 'question': return renderQuestion(block, side);
+      case 'scenario': return renderScenario(block);
+      case 'resource': return renderResource(block);
+      case 'written': return renderWritten(block, side);
       default: return '';
     }
   }
@@ -261,6 +376,37 @@
     var block = currentBook.spreads[spreadIndex][side];
     state.answers[answerKey(side)] = chosen;
     markAnswer(btn.closest('.question-block'), block, chosen);
+  });
+
+  spreadEl.addEventListener('click', function (e) {
+    var btn = e.target.closest && e.target.closest('.written-check');
+    if (!btn || flipping) return;
+    var wrap = btn.closest('.written-block');
+    var block = currentBook.spreads[spreadIndex][wrap.getAttribute('data-side')];
+    var text = wrap.querySelector('.written-input').value.trim();
+    var out = wrap.querySelector('.written-result');
+
+    if (!text) {
+      out.hidden = false;
+      out.innerHTML = '<p class="written-note">Write something first, then compare.</p>';
+      return;
+    }
+
+    var r = scoreAnswer(text, block);
+    var missed = r.missed.length
+      ? '<p class="written-note">Ideas the example mentions that yours did not: <strong>' +
+        r.missed.join('</strong>, <strong>') + '</strong>.</p>'
+      : '<p class="written-note">Your answer touched on every idea the example does.</p>';
+
+    out.hidden = false;
+    out.innerHTML =
+      '<div class="written-score"><span class="written-pct">' + r.pct + '%</span>' +
+      '<span class="written-band">' + bandFor(r.pct) + '</span></div>' +
+      '<div class="written-meter"><span style="width:' + r.pct + '%"></span></div>' +
+      (r.tooShort ? '<p class="written-note">That is very short — a few full sentences will compare better.</p>' : '') +
+      missed +
+      '<p class="written-note written-caveat">This measures how much your wording overlaps the example, not whether you are right. A good answer in different words will score lower.</p>' +
+      '<p class="page-kicker">Example answer</p><p class="written-example">' + block.example + '</p>';
   });
 
   readerBack.addEventListener('click', function () { step(-1); });

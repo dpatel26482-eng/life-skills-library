@@ -362,3 +362,117 @@ body.is-reading .scroll-track { opacity: 0; transition: opacity .45s ease; }
 /* the pages are their own scroll containers; Lenis must keep its hands off them
    or the wheel is swallowed by the page-level smooth scrolling */
 .book-reader .page { overscroll-behavior: contain; }
+
+/* =====================================================================
+   GUIDE ACTIVITY BLOCKS (v3)
+   Scenario cards, resource links and written-answer marking.
+   ===================================================================== */
+
+/* ten chapters no longer fit on one line */
+.book-reader .chapter-tabs { flex-wrap: wrap; row-gap: .4rem; }
+
+/* ---- scenario ---- */
+.book-reader .scenario-card {
+  margin-top: .6rem;
+  padding: .95rem 1.1rem;
+  border-left: 2px solid var(--gold);
+  background: rgba(107, 79, 32, .07);
+  border-radius: 0 8px 8px 0;
+}
+.book-reader .scenario-card p { margin: 0 0 .7rem; }
+.book-reader .scenario-card p:last-child { margin-bottom: 0; }
+.book-reader .scenario-facts { margin-top: .9rem; }
+
+/* ---- resource link ---- */
+.book-reader .resource-link {
+  display: flex; align-items: center; gap: .85rem;
+  margin-top: 1rem; padding: .85rem 1rem;
+  border: 1px solid rgba(107, 79, 32, .45);
+  border-radius: 8px;
+  background: rgba(107, 79, 32, .06);
+  color: var(--ink);
+  text-decoration: none;
+  transition: background .22s ease, border-color .22s ease, transform .22s ease;
+}
+.book-reader .resource-link:hover {
+  background: rgba(107, 79, 32, .13);
+  border-color: rgba(107, 79, 32, .75);
+  transform: translateY(-1px);
+}
+.book-reader .resource-icon {
+  flex: none; width: 2rem; height: 2rem;
+  display: grid; place-items: center;
+  border-radius: 50%;
+  background: rgba(107, 79, 32, .16);
+  font-size: 1rem;
+}
+.book-reader .resource-text { display: flex; flex-direction: column; gap: .15rem; }
+.book-reader .resource-title {
+  font-family: Calibri, Carlito, "Segoe UI", system-ui, sans-serif;
+  font-weight: 600; font-size: .86rem;
+}
+.book-reader .resource-sub { font-size: .72rem; opacity: .7; }
+
+/* ---- written answers ---- */
+.book-reader .written-block { display: flex; flex-direction: column; }
+.book-reader .written-hint {
+  margin: -.2rem 0 .7rem;
+  font-size: .74rem; font-style: italic; opacity: .72;
+}
+.book-reader .written-input {
+  width: 100%; resize: vertical;
+  padding: .7rem .8rem;
+  border: 1px solid rgba(36, 26, 18, .28);
+  border-radius: 6px;
+  background: rgba(255, 255, 255, .45);
+  color: var(--ink);
+  font-family: Calibri, Carlito, "Segoe UI", system-ui, sans-serif;
+  font-size: .82rem; line-height: 1.55;
+}
+.book-reader .written-input:focus {
+  outline: none;
+  border-color: rgba(107, 79, 32, .7);
+  background: rgba(255, 255, 255, .7);
+}
+.book-reader .written-check {
+  align-self: flex-start;
+  margin-top: .7rem; padding: .48rem 1.1rem;
+  border: 1px solid rgba(107, 79, 32, .5);
+  border-radius: 4px;
+  background: rgba(107, 79, 32, .1);
+  color: var(--ink);
+  font-family: Calibri, Carlito, "Segoe UI", system-ui, sans-serif;
+  font-size: .8rem; font-weight: 600;
+  cursor: pointer;
+  transition: background .22s ease;
+}
+.book-reader .written-check:hover { background: rgba(107, 79, 32, .2); }
+
+.book-reader .written-result { margin-top: .9rem; }
+.book-reader .written-score { display: flex; align-items: baseline; gap: .6rem; }
+.book-reader .written-pct {
+  font-family: var(--font-display);
+  font-size: 1.8rem; line-height: 1;
+  color: var(--leather-oxblood);
+}
+.book-reader .written-band { font-size: .78rem; font-weight: 600; }
+.book-reader .written-meter {
+  margin: .5rem 0 .7rem;
+  height: 4px; border-radius: 2px;
+  background: rgba(36, 26, 18, .14);
+  overflow: hidden;
+}
+.book-reader .written-meter span {
+  display: block; height: 100%;
+  background: linear-gradient(90deg, var(--leather-oxblood), var(--gold-deep));
+}
+.book-reader .written-note { margin: .35rem 0; font-size: .74rem; line-height: 1.5; }
+.book-reader .written-caveat { opacity: .65; font-style: italic; }
+.book-reader .written-example {
+  margin: .2rem 0 0;
+  padding: .7rem .85rem;
+  border-left: 2px solid rgba(107, 79, 32, .5);
+  background: rgba(107, 79, 32, .06);
+  border-radius: 0 6px 6px 0;
+  font-size: .78rem; line-height: 1.55;
+}

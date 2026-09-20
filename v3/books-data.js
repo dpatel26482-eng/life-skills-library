@@ -16,115 +16,254 @@
       hotspot: { x: '13%', y: '10%' },
       spreads: [
         {
-          chapter: 'Why it matters',
+          chapter: 'What it is',
           left: {
             type: 'prose',
-            kicker: 'Why it matters',
-            heading: 'Why It Matters',
+            kicker: 'What it is',
+            heading: 'What Budgeting Is',
             paragraphs: [
-              "Every dollar you earn already has an invisible plan, whether you've written one down or not — it either goes somewhere on purpose, or it goes somewhere by accident. A budget isn't about restriction. It's about being the one who decides which of those it is.",
-              "Most people don't fail at budgeting because they're bad with money — they fail because they never actually looked at where it was going in the first place. The $53 a week that goes missing isn't a moral failure. It's just what happens when nobody's counting."
+              'Budgeting is the process of allocating, managing and tracking money over a set period of time. The budget itself is the plan &mdash; a record of what comes in, what goes out, and what is set aside.',
+              'The purpose is control. A budget gives a person a clear view of where their money comes from and where it goes, which is the difference between directing money and simply watching it disappear.'
             ]
           },
           right: {
             type: 'pullquote',
-            quote: "A budget doesn't restrict you. It tells your money what to do before you do.",
+            quote: 'Overspending usually starts as a cash flow problem, not a spending problem.',
             list: [
-              "You already have a budget — you just haven't written it down.",
-              "Needs and wants aren't good or bad. They're just different jobs for your money.",
-              "A buffer and a goal aren't the same thing, even though they're both “savings.”"
+              'Most people slow their spending only once they notice money running low &mdash; by which point the decisions are already made.',
+              'An estimated <strong>52% of Australians were living paycheck to paycheck in 2025</strong> (ADP, 2025).',
+              'A 2024 study links that pattern closely to limited financial literacy and an inability to budget effectively (Mayndarto, Andrinaldo &amp; Baronkulovich, 2024).'
             ]
           }
         },
+
         {
-          chapter: 'How it works',
+          chapter: 'Needs & wants',
+          left: {
+            type: 'prose',
+            kicker: 'The psychology of buying',
+            heading: 'Needs And Wants',
+            paragraphs: [
+              'A <strong>need</strong> is an expense essential for basic living and functioning &mdash; rent, groceries, healthcare. A <strong>want</strong> is discretionary: it improves quality of life but is not strictly necessary to get by, such as eating out, subscriptions, or the latest phone upgrade.',
+              'The distinction matters because needs should generally be covered first, before any money is allocated toward wants. Consistently prioritising wants over needs is one of the most common reasons people fall into financial strain &mdash; even while earning a reasonable income.'
+            ]
+          },
+          right: {
+            type: 'pullquote',
+            quote: 'If you don&rsquo;t buy it, will there be an immediate negative consequence for you?',
+            list: [
+              'Yes &mdash; it is almost certainly a <strong>need</strong>.',
+              'No, but I&rsquo;d be disappointed &mdash; that is a <strong>want</strong>, and wants are not the enemy. They just get paid after needs.',
+              'The test works because it forces a consequence, not a feeling. &ldquo;I really want it&rdquo; and &ldquo;I need it&rdquo; feel identical in the moment.'
+            ]
+          }
+        },
+
+        {
+          chapter: 'The four parts',
           left: {
             type: 'prose',
             kicker: 'How it works',
-            heading: 'How It Works',
+            heading: 'The Four Parts',
             paragraphs: [
-              "Split spending into two kinds of costs: fixed (about the same every time — rent, a phone plan, a subscription) and variable (moves around — food, fuel, going out). Knowing which is which tells you where there's actually room to move.",
-              "A rough shape to start from is 50/30/20: about half toward needs, about a third toward wants, the rest toward savings. It's a starting point to adjust from, not a rule to hit exactly.",
-              "Two different savings jobs matter here too: a buffer (a small cushion for the unexpected) and a sinking fund (money saved on purpose for something specific you already know is coming)."
+              'A complete budget is built from four components working together. <strong>Income</strong> is the total money coming in each period &mdash; a job, an allowance, any regular source &mdash; and it sets the ceiling for everything else.',
+              '<strong>Fixed expenses</strong> are essential, predictable costs that stay roughly the same each period. <strong>Variable expenses</strong> fluctuate month to month and need more active monitoring, since they are the easiest to overspend on without noticing.',
+              '<strong>Savings</strong> should be its own category, not whatever happens to be left over. Setting a portion aside before spending the rest is what stops long-term goals being quietly deprioritised in favour of short-term spending.'
             ]
           },
           right: {
-            type: 'splitbar',
-            heading: 'A shape to start from — not a rule',
-            segments: [
-              { label: 'Needs', pct: 50, color: NAVY },
-              { label: 'Wants', pct: 30, color: OXBLOOD },
-              { label: 'Savings', pct: 20, color: GREEN }
-            ]
+            type: 'table',
+            heading: 'The four parts, side by side',
+            columns: ['Part', 'What it is', 'Examples'],
+            rows: [
+              ['Income', 'Money in &mdash; the ceiling for everything else', 'Wages, allowance'],
+              ['Fixed', 'Predictable, about the same each period', 'Rent, phone plan'],
+              ['Variable', 'Moves around; needs watching', 'Groceries, fuel'],
+              ['Savings', 'Set aside first, not left over', 'Buffer, a goal']
+            ],
+            note: 'Together these turn a budget from a rough guess into a plan you can actually track and adjust.'
           }
         },
+
         {
-          chapter: 'Worked example',
+          chapter: 'Building one',
           left: {
             type: 'prose',
-            kicker: 'Worked example',
-            heading: 'Worked Example — Mia, 17',
+            kicker: 'How to build it',
+            heading: 'Building A Budget',
             paragraphs: [
-              "Mia works a casual shift at a café and takes home $420 most weeks. $80 goes straight to her parents for board. She's confident about her phone plan and transport costs, and she's been putting money toward a trip.",
-              "But when she added up everything she could actually name, there was still $53 a week she couldn't account for — not one big purchase, just a gap between what came in and what she could explain."
+              'Separate expenses into a small number of broad categories &mdash; needs such as rent, bills and groceries, and discretionary spending such as eating out and subscriptions &mdash; then set a rough percentage or dollar target for each.',
+              'From there, a short weekly or monthly review of what went well, what didn&rsquo;t, and what to adjust keeps a budget a living plan rather than a one-off spreadsheet exercise.',
+              'Tracking alone is not enough. Plenty of people record every transaction and still have no idea what to do with the information. What matters is turning those numbers into a few meaningful checks: did spending stay within its target for a category, did the period end in surplus or deficit, and were recurring bills and savings goals actually met. Reviewing quarterly or year-to-date as well catches costs that don&rsquo;t appear every month.'
             ]
           },
           right: {
-            type: 'barchart',
-            heading: "Where Mia's $420 actually went",
-            bars: [
-              { label: 'Board', value: 80, display: '$80' },
-              { label: 'Essentials', value: 75, display: '$75' },
-              { label: 'Savings', value: 60, display: '$60' },
-              { label: 'Going out', value: 152, display: '$152' },
-              { label: 'Unaccounted', value: 53, display: '$53' }
-            ],
-            caption: "The point isn't that $53 is a disaster. It's that Mia couldn't have told you where it went — until she wrote it down."
+            type: 'resource',
+            kicker: 'Template',
+            heading: 'Start From A Template',
+            body: 'A blank page is the hardest place to begin. This spreadsheet already has the four categories laid out &mdash; make a copy and put your own numbers in.',
+            href: 'https://docs.google.com/spreadsheets/d/1zi5Dpz6L2mNOB5_AT6P-TAhXpFxCrSAgjlv81FvX0MU/edit?usp=sharing',
+            linkText: 'Budget template (Google Sheets)',
+            linkSub: 'Opens in a new tab &mdash; File &rsaquo; Make a copy to edit your own'
           }
         },
+
         {
-          chapter: 'Questions',
+          chapter: 'Is it working?',
           left: {
-            type: 'question',
-            prompt: "Mia takes home $420 a week and gives $80 to her parents for board. Which of these is a fixed cost in her budget?",
-            options: ['Going out with friends', '$80 board', 'Weekly petrol'],
-            correct: 1,
-            explanation: "Board is the same amount most weeks, which makes it a fixed cost. Going out and petrol both move around depending on the week — that makes them variable."
+            type: 'toolkit',
+            heading: 'Three Questions, Every Period',
+            items: [
+              'Did I stay within my planned spending for each category?',
+              'Did I avoid relying on debt to cover regular expenses?',
+              'Did my savings goal actually get met, rather than skipped?'
+            ]
+          },
+          right: {
+            type: 'prose',
+            kicker: 'Knowing it works',
+            heading: 'What Success Looks Like',
+            paragraphs: [
+              'Spending patterns shift month to month, so when problems come up, the useful response is understanding why and adjusting the budget &mdash; not abandoning it.',
+              'Over a longer stretch, success looks like a growing savings balance and less financial stress.',
+              'Budgets are not always an accurate reflection of real habits. Life is not linear and unforeseen events always arise. A good budget does not prevent that &mdash; it helps you absorb it and recover.'
+            ]
+          }
+        },
+
+        {
+          chapter: 'Scenario',
+          left: {
+            type: 'scenario',
+            kicker: 'Scenario',
+            heading: 'Jordan, 17',
+            paragraphs: [
+              'Jordan works weekends at a supermarket and brings home <strong>$460 a month</strong>. They pay $60 a month to their parents for board, $35 for a phone plan, and $18 for a music subscription they use most days.',
+              'Last month they spent $140 on food out with friends, $45 on transport, and put <strong>$0</strong> into savings &mdash; they had planned to save $50, but there was nothing left by the end of the month.',
+              'Jordan says the problem is that they &ldquo;don&rsquo;t earn enough&rdquo;.'
+            ],
+            facts: [
+              { label: 'Income', value: '$460' },
+              { label: 'Board (fixed)', value: '$60' },
+              { label: 'Phone plan (fixed)', value: '$35' },
+              { label: 'Subscription (fixed)', value: '$18' },
+              { label: 'Food out (variable)', value: '$140' },
+              { label: 'Transport (variable)', value: '$45' },
+              { label: 'Left at month end', value: '$162', isTotal: true }
+            ]
           },
           right: {
             type: 'question',
-            prompt: "What's the actual point of the 50/30/20 split?",
+            prompt: 'Jordan ended the month with $162 unspent but saved nothing. What does this most clearly show?',
             options: [
-              'A legal requirement for how you must spend your money',
-              'A rough starting shape to adjust from, not a fixed rule',
-              "A way to guarantee you'll never run out of money"
+              'Jordan does not earn enough to save anything',
+              'Savings was treated as leftovers rather than its own category',
+              'Jordan&rsquo;s fixed expenses are too high to allow saving'
             ],
             correct: 1,
-            explanation: "50/30/20 is a starting shape, not a law. Some weeks — or some incomes — won't fit it neatly, and that's fine. The point is having a shape to compare against, not hitting the numbers exactly."
+            explanation: 'The money was there &mdash; $162 of it. Because savings was whatever happened to remain rather than an amount set aside first, it got absorbed by other spending. This is exactly why savings is treated as its own part of a budget.'
           }
         },
+
         {
-          chapter: 'Toolkit',
+          chapter: 'Scenario II',
           left: {
-            type: 'toolkit',
-            heading: 'This Week',
-            items: [
-              'Write down every dollar that came in and went out for one week — no judgement, just numbers.',
-              "Open a second account and give it one job: holding money you're not allowed to spend yet.",
-              'Pick one number — savings, or spending, or debt — and check it every Sunday for a month.',
-              "Find the “$53” in your own spending: the category you couldn't explain if someone asked."
+            type: 'question',
+            prompt: 'Which of Jordan&rsquo;s costs would be the most reasonable first target for cutting back?',
+            options: [
+              'The $60 board payment',
+              'The $140 spent on food out',
+              'The $45 spent on transport'
+            ],
+            correct: 1,
+            explanation: 'Food out is variable and discretionary &mdash; it is the largest single cost, it moves around, and reducing it has no immediate negative consequence. Board and transport are closer to needs, and board is fixed.'
+          },
+          right: {
+            type: 'question',
+            prompt: 'Jordan&rsquo;s month ended with more income than expenses. What is that called?',
+            options: ['A deficit', 'A surplus', 'Cash flow'],
+            correct: 1,
+            explanation: 'A surplus is when income exceeds expenses over a period. A deficit is the reverse. Cash flow describes the movement of money in and out over time, not the result at the end.'
+          }
+        },
+
+        {
+          chapter: 'Check yourself',
+          left: {
+            type: 'question',
+            prompt: 'Which of these is the best description of a budget?',
+            options: [
+              'A record of money you have already spent',
+              'A plan that tracks income, expenses and savings over a set period',
+              'A limit set by a bank on how much you can spend'
+            ],
+            correct: 1,
+            explanation: 'A budget is forward-looking: it plans and tracks income, expenses and savings across a period. A record of past spending is useful input, but on its own it is not a budget.'
+          },
+          right: {
+            type: 'question',
+            prompt: 'Why are variable expenses usually the ones that need closer monitoring?',
+            options: [
+              'They are always larger than fixed expenses',
+              'They change month to month, so overspending is easy to miss',
+              'They are never essential'
+            ],
+            correct: 1,
+            explanation: 'Variable costs such as groceries, fuel and entertainment fluctuate, so there is no steady figure to compare against. That makes creeping overspending much harder to notice than a change in a fixed bill.'
+          }
+        },
+
+        {
+          chapter: 'Write it out',
+          left: {
+            type: 'written',
+            prompt: 'In your own words, explain the difference between a need and a want, and why the order matters in a budget.',
+            hint: 'Two or three sentences is plenty. Try to include the test you would use to tell them apart.',
+            example: 'A need is an expense essential for basic living, like rent, groceries or healthcare, while a want is discretionary spending that improves quality of life but is not necessary, like eating out or subscriptions. The order matters because needs should be covered first before money is allocated to wants. A useful test is asking whether not buying it would have an immediate negative consequence.',
+            keywords: [
+              'need', 'essential|necessary|must have|survive|live',
+              'want', 'discretionary|optional|not necessary|nice to have',
+              'needs first|cover needs|before wants|priority',
+              'consequence|immediate problem|go without|happens if'
+            ]
+          },
+          right: {
+            type: 'written',
+            prompt: 'Jordan says their problem is that they don&rsquo;t earn enough. Using the scenario, explain whether you agree, and what you would change.',
+            hint: 'Refer to the numbers. What was actually left at the end of the month?',
+            example: 'I disagree, because Jordan had $162 left at the end of the month and still saved nothing. The problem is not income but that savings was treated as leftover money instead of being set aside first. I would move $50 into savings at the start of the month and reduce the $140 spent on food out, since that is variable discretionary spending.',
+            keywords: [
+              'income|earn|earning|wage',
+              'savings|save|saved',
+              'leftover|left over|remaining|what was left',
+              'set aside first|save first|before spending|straight away',
+              'food out|eating out|takeaway|friends',
+              'variable|discretionary|changes'
+            ]
+          }
+        },
+
+        {
+          chapter: 'Glossary',
+          left: {
+            type: 'glossary',
+            heading: 'Glossary',
+            terms: [
+              { term: 'Budget', def: 'A plan that tracks income, expenses and savings over a specific period of time.' },
+              { term: 'Income', def: 'The total money coming into a budget each period, from a job, allowance or other regular source.' },
+              { term: 'Fixed expense', def: 'An essential, predictable cost that stays roughly the same each period, such as rent or a phone plan.' },
+              { term: 'Variable expense', def: 'A cost that fluctuates month to month, such as groceries or entertainment.' },
+              { term: 'Need', def: 'An expense essential for basic living and functioning, such as rent, groceries or healthcare.' }
             ]
           },
           right: {
             type: 'glossary',
-            heading: 'Glossary',
+            heading: 'Glossary, continued',
             terms: [
-              { term: 'Budget', def: "A plan for money you haven't spent yet — not a record of money you already have." },
-              { term: 'Fixed cost', def: "A bill that's about the same every time: rent, a phone plan, a subscription." },
-              { term: 'Variable cost', def: 'Spending that changes week to week: food, fuel, going out.' },
-              { term: 'Buffer', def: 'A small cash cushion for the unexpected — a bill, a repair, a bad week.' },
-              { term: 'Sinking fund', def: 'Money saved gradually toward something specific and expected, like new shoes or a trip.' },
-              { term: '50/30/20', def: 'A rough shape (needs / wants / savings), not a rule — a starting point to adjust from.' }
+              { term: 'Want', def: 'A discretionary expense that improves quality of life but is not strictly necessary, such as eating out or a subscription.' },
+              { term: 'Surplus', def: 'When income exceeds expenses at the end of a budgeting period.' },
+              { term: 'Deficit', def: 'When expenses exceed income at the end of a budgeting period.' },
+              { term: 'Cash flow', def: 'The movement of money in and out of a budget over time; poor cash flow management is a leading cause of overspending.' }
             ]
           }
         }
