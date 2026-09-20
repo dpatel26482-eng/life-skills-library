@@ -19,8 +19,10 @@
   }
 
   function renderPullquote(b) {
-    return '<p class="pullquote">' + b.quote + '</p><ul class="numbered-list">' +
-      b.list.map(function (i) { return '<li>' + i + '</li>'; }).join('') + '</ul>';
+    var items = b.list || [];
+    return '<p class="pullquote">' + b.quote + '</p>' +
+      (items.length ? '<ul class="numbered-list">' +
+        items.map(function (i) { return '<li>' + i + '</li>'; }).join('') + '</ul>' : '');
   }
 
   function renderSplitbar(b) {
@@ -68,7 +70,9 @@
   }
 
   function renderToolkit(b) {
-    return '<p class="page-kicker">Toolkit</p><h3>' + b.heading + '</h3><ol class="toolkit-list">' +
+    return '<p class="page-kicker">Toolkit</p><h3>' + b.heading + '</h3>' +
+      (b.intro ? '<p>' + b.intro + '</p>' : '') +
+      '<ol class="toolkit-list">' +
       b.items.map(function (i) { return '<li>' + i + '</li>'; }).join('') + '</ol>';
   }
 
@@ -365,7 +369,7 @@
     });
     var explanation = container.querySelector('.answer-explanation');
     explanation.hidden = false;
-    explanation.textContent = (chosen === block.correct ? 'Correct — ' : 'Not quite — ') + block.explanation;
+    explanation.textContent = (chosen === block.correct ? 'Correct. ' : 'Not quite. ') + block.explanation;
   }
 
   spreadEl.addEventListener('click', function (e) {
@@ -403,7 +407,7 @@
       '<div class="written-score"><span class="written-pct">' + r.pct + '%</span>' +
       '<span class="written-band">' + bandFor(r.pct) + '</span></div>' +
       '<div class="written-meter"><span style="width:' + r.pct + '%"></span></div>' +
-      (r.tooShort ? '<p class="written-note">That is very short — a few full sentences will compare better.</p>' : '') +
+      (r.tooShort ? '<p class="written-note">That is very short. A few full sentences will compare better.</p>' : '') +
       missed +
       '<p class="written-note written-caveat">This measures how much your wording overlaps the example, not whether you are right. A good answer in different words will score lower.</p>' +
       '<p class="page-kicker">Example answer</p><p class="written-example">' + block.example + '</p>';
