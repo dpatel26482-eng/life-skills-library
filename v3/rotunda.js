@@ -8,7 +8,7 @@
 
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
-import { pbr, enableAO, box, spineLabel, glowSprite, manager } from './materials.js?v=50';
+import { pbr, enableAO, box, spineLabel, glowSprite, manager } from './materials.js?v=51';
 
 export const ROT_R = 16.5;      // drum radius
 export const ROT_H = 14;        // drum height
@@ -248,6 +248,7 @@ export function buildRotunda(centreZ) {
     mesh.userData.glow = glow;
 
     const halo = new THREE.PointLight(GOLD, 3.0, 3.8, 2);
+    halo.userData.budget = true;
     halo.position.set(spec.x, y, spec.z + spec.dir * 1.1);
     island.add(halo);
   }
@@ -296,6 +297,7 @@ export function buildRotunda(centreZ) {
   // hard shadow edges, which keeps the room readable but still moody.
   for (const dz of [7.5, -7.5]) {
     const bounce = new THREE.PointLight(0xffc98a, 13, 20, 2);
+    bounce.userData.budget = true;
     bounce.position.set(0, 6, dz);
     g.add(bounce);
   }
@@ -303,6 +305,7 @@ export function buildRotunda(centreZ) {
   // read as flat black slabs against a lit wall.
   for (const dx of [-7.5, 7.5]) {
     const side = new THREE.PointLight(0xffc07a, 8, 16, 2);
+    side.userData.budget = true;
     side.position.set(dx, 5.2, -0.6);
     g.add(side);
   }
@@ -356,6 +359,7 @@ export function buildRotunda(centreZ) {
     torch.add(halo);
 
     const light = new THREE.PointLight(0xffa457, 6.5, 9, 2);
+    light.userData.budget = true;
     light.position.copy(flame.position);
     torch.add(light);
 

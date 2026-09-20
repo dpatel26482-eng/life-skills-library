@@ -19,9 +19,9 @@ import { ShaderPass } from 'three/addons/postprocessing/ShaderPass.js';
 import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
 import { RGBELoader } from 'three/addons/loaders/RGBELoader.js';
 import Lenis from 'lenis';
-import { pbr, enableAO, manager } from './materials.js?v=50';
-import { buildRotunda, loadProps, ROT_R, ROT_H } from './rotunda.js?v=50';
-import { makeBook } from './book.js?v=50';
+import { pbr, enableAO, manager } from './materials.js?v=51';
+import { buildRotunda, loadProps, ROT_R, ROT_H } from './rotunda.js?v=51';
+import { makeBook } from './book.js?v=51';
 
 const GOLD = 0xf0c877;
 const LAMP = 0xffcf8a;
@@ -38,6 +38,12 @@ renderer.toneMapping = THREE.ACESFilmicToneMapping;
 renderer.toneMappingExposure = 1.80;
 renderer.shadowMap.enabled = true;
 renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+// The room is static. Re-rendering every caster into the shadow map on every
+// frame buys nothing, so shadows are drawn on demand instead: once things have
+// loaded, and again only when something actually moves.
+renderer.shadowMap.autoUpdate = false;
+let shadowFrames = 0;
+function restampShadows(n) { shadowFrames = Math.max(shadowFrames, n || 2); }
 
 const scene = new THREE.Scene();
 scene.background = new THREE.Color(0x050505);
@@ -59,6 +65,7 @@ new RGBELoader(manager).load('assets/hdri/ballroom_2k.hdr', (hdr) => {
   hdr.dispose();
   pmrem.dispose();
   envReady = true;
+  restampShadows(3);
 }, undefined, (e) => console.warn('HDRI failed', e));
 
 // ---------------------------------------------------------------- materials --
@@ -145,7 +152,7 @@ function buildHallInstanced() {
     // lights stay real objects — they are culled by distance every frame
     const lamp = new THREE.PointLight(LAMP, 30, 24, 2);
     lamp.position.set(0, globeY, globeZ);
-    lamp.userData.isBayLamp = true;
+    lamp.userData.budget = true;         // culled by distance, see budgetLights()
     hall.add(lamp);
   }
 
@@ -242,7 +249,7 @@ let chandelierLight = null;
 let chandelierHalo = null;
 let propsReady = false;
 loadProps(rot.group, (l) => { chandelierLight = l; })
-  .then((p) => { propsReady = true; chandelierHalo = p?.halo || null; })
+  .then((p) => { propsReady = true; chandelierHalo = p?.halo || null; restampShadows(3); })
   .catch((err) => console.warn('props failed to load', err));
 
 scene.add(new THREE.AmbientLight(0x33281c, 1.9));
@@ -259,10 +266,44 @@ for (let i = 0; i < moteCount; i++) {
 }
 const moteGeo = new THREE.BufferGeometry();
 moteGeo.setAttribute('position', new THREE.BufferAttribute(motePos, 3));
-const motes = new THREE.Points(moteGeo, new THREE.PointsMaterial({
-  color: GOLD, size: 0.045, transparent: true, opacity: 0.62,
-  blending: THREE.AdditiveBlending, depthWrite: false, sizeAttenuation: true
-}));
+moteGeo.setAttribute('aSeed', new THREE.BufferAttribute(moteSeed, 1));
+
+// The drift used to be a 460 iteration JS loop plus a buffer upload every frame.
+// The same motion expressed in the vertex shader costs the CPU nothing.
+const moteMat = new THREE.ShaderMaterial({
+  uniforms: {
+    uTime: { value: 0 },
+    uColour: { value: new THREE.Color(GOLD) },
+    uCeiling: { value: HALL_H }
+  },
+  transparent: true,
+  depthWrite: false,
+  blending: THREE.AdditiveBlending,
+  vertexShader: `
+    attribute float aSeed;
+    uniform float uTime;
+    uniform float uCeiling;
+    void main() {
+      vec3 p = position;
+      float rise = 0.09 + fract(aSeed) * 0.13;
+      p.y = mod(p.y + uTime * rise, uCeiling);
+      p.x += sin(uTime * 0.4 + aSeed) * 0.22;
+      vec4 mv = modelViewMatrix * vec4(p, 1.0);
+      gl_PointSize = 0.045 * (420.0 / -mv.z);
+      gl_Position = projectionMatrix * mv;
+    }
+  `,
+  fragmentShader: `
+    uniform vec3 uColour;
+    void main() {
+      // round the square point sprite off and fade it at the edge
+      float d = length(gl_PointCoord - 0.5);
+      if (d > 0.5) discard;
+      gl_FragColor = vec4(uColour, 0.62 * smoothstep(0.5, 0.1, d));
+    }
+  `
+});
+const motes = new THREE.Points(moteGeo, moteMat);
 scene.add(motes);
 
 // =============================================================================
@@ -271,7 +312,10 @@ scene.add(motes);
 const composer = new EffectComposer(renderer);
 composer.addPass(new RenderPass(scene, camera));
 
-const bloom = new UnrealBloomPass(new THREE.Vector2(window.innerWidth, window.innerHeight), 0.34, 0.62, 0.82);
+// Bloom runs several blur passes. At half resolution it is roughly a quarter of
+// the fragment work and, being a blur, looks the same.
+const bloom = new UnrealBloomPass(
+  new THREE.Vector2(window.innerWidth / 2, window.innerHeight / 2), 0.34, 0.62, 0.82);
 composer.addPass(bloom);
 
 const GrainShader = {
@@ -367,17 +411,25 @@ let pointerHoming = false;   // easing drag offset back to centre after a focus
 // every fragment against every visible light, so 13 corridor lamps cost the same
 // whether they are on screen or 80 metres behind you. Hiding a light removes it
 // from the lighting pass entirely.
-const bayLamps = [];
-hall.traverse((o) => { if (o.isLight && o.userData.isBayLamp) bayLamps.push(o); });
-const LIT_BAYS = 5;
+// Corridor lamps, torches, book halos and the room fills all go into one pool,
+// and only the nearest few stay lit. Keeping the count fixed matters as much as
+// keeping it low: changing the number of visible lights forces Three.js to
+// recompile every material, which stutters far worse than the lights cost.
+const budgeted = [];
+scene.traverse((o) => { if (o.isLight && o.userData.budget) budgeted.push(o); });
+const LIGHT_BUDGET = 7;
 const _lampWorld = new THREE.Vector3();
+const _scored = [];
 
-function cullLights() {
-  const scored = bayLamps.map((l) => {
+function budgetLights() {
+  _scored.length = 0;
+  for (let i = 0; i < budgeted.length; i++) {
+    const l = budgeted[i];
     l.getWorldPosition(_lampWorld);
-    return { l, d: _lampWorld.distanceToSquared(camera.position) };
-  }).sort((a, b) => a.d - b.d);
-  scored.forEach((e, i) => { e.l.visible = i < LIT_BAYS; });
+    _scored.push({ l: l, d: _lampWorld.distanceToSquared(camera.position) });
+  }
+  _scored.sort((a, b) => a.d - b.d);
+  for (let i = 0; i < _scored.length; i++) _scored[i].l.visible = i < LIGHT_BUDGET;
 }
 
 function placeCamera(p) {
@@ -611,6 +663,7 @@ function pullBook(mesh) {
   // only the mesh left those on the shelf, so the book you clicked still appeared
   // to be sitting there while a second one flew out.
   mesh.visible = false;
+  restampShadows(2);
   if (mesh.userData.glow) mesh.userData.glow.visible = false;
   if (mesh.userData.label) mesh.userData.label.visible = false;
 }
@@ -666,6 +719,7 @@ function updateReading(dt) {
       readingLight.intensity = 0;
       r.rig.group.visible = false;
       r.mesh.visible = true;
+      restampShadows(2);
       if (r.mesh.userData.glow) r.mesh.userData.glow.visible = true;
       if (r.mesh.userData.label) r.mesh.userData.label.visible = true;
       busyBook = null;
@@ -771,16 +825,9 @@ function render() {
     inRoom = nowInRoom;
     document.body.classList.toggle('in-room', inRoom);
   }
-  cullLights();
+  if (frames % 6 === 0) budgetLights();   // positions barely change frame to frame
 
-  // motes drift upward and wrap
-  const arr = moteGeo.attributes.position.array;
-  for (let i = 0; i < moteCount; i++) {
-    arr[i * 3 + 1] += dt * (0.09 + (moteSeed[i] % 1) * 0.13);
-    arr[i * 3] += Math.sin(t * 0.4 + moteSeed[i]) * dt * 0.06;
-    if (arr[i * 3 + 1] > HALL_H) arr[i * 3 + 1] = 0;
-  }
-  moteGeo.attributes.position.needsUpdate = true;
+  moteMat.uniforms.uTime.value = t;
 
   // lit books breathe
   for (const m of pickable) {
@@ -809,14 +856,47 @@ function render() {
     }
   }
 
+  // spend a frame on shadows only when something asked for it
+  if (shadowFrames > 0) { renderer.shadowMap.needsUpdate = true; shadowFrames--; }
+
   grainPass.uniforms.uTime.value = t;
   composer.render();
   frames++;
 }
 
+// Adaptive resolution. The scene has to run on whatever machine opens it, and
+// pixel count is the one dial that trades cleanly against frame rate, so it is
+// tuned from measured frame times rather than guessed at up front.
+const DPR_STEPS = [0.75, 1, 1.25, 1.5];
+let dprIndex = DPR_STEPS.indexOf(Math.min(window.devicePixelRatio, 1.5));
+if (dprIndex < 0) dprIndex = DPR_STEPS.length - 1;
+let frameAcc = 0, frameCount = 0, lastAdjust = 0;
+
+function tuneResolution(now, frameMs) {
+  frameAcc += frameMs; frameCount++;
+  if (frameCount < 45 || now - lastAdjust < 2000) return;
+  const avg = frameAcc / frameCount;
+  frameAcc = 0; frameCount = 0; lastAdjust = now;
+
+  if (avg > 22 && dprIndex > 0) {
+    dprIndex--;                       // struggling: give back pixels
+  } else if (avg < 11 && dprIndex < DPR_STEPS.length - 1
+             && DPR_STEPS[dprIndex + 1] <= window.devicePixelRatio) {
+    dprIndex++;                       // headroom: take some back
+  } else {
+    return;
+  }
+  renderer.setPixelRatio(DPR_STEPS[dprIndex]);
+  composer.setPixelRatio?.(DPR_STEPS[dprIndex]);
+  restampShadows(2);
+}
+
+let lastFrameTime = 0;
 function loop(time) {
   lenis.raf(time);
   render();
+  if (lastFrameTime) tuneResolution(time, time - lastFrameTime);
+  lastFrameTime = time;
   requestAnimationFrame(loop);
 }
 requestAnimationFrame(loop);
@@ -827,6 +907,8 @@ window.addEventListener('resize', () => {
   camera.updateProjectionMatrix();
   renderer.setSize(window.innerWidth, window.innerHeight);
   composer.setSize(window.innerWidth, window.innerHeight);
+  bloom.setSize(window.innerWidth / 2, window.innerHeight / 2);
+  restampShadows(2);
 });
 
 // ------------------------------------------------------------------- chrome --
@@ -1020,7 +1102,8 @@ window.__world = {
       programs: renderer.info.programs?.length,
       textures: renderer.info.memory.textures,
       geometries: renderer.info.memory.geometries,
-      pixelRatio: renderer.getPixelRatio()
+      pixelRatio: renderer.getPixelRatio(),
+    visibleLights: (() => { let n = 0; scene.traverse((o) => { if (o.isLight && o.visible) n++; }); return n; })()
     };
   },
 
