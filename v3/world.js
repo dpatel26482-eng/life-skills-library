@@ -19,9 +19,9 @@ import { ShaderPass } from 'three/addons/postprocessing/ShaderPass.js';
 import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
 import { RGBELoader } from 'three/addons/loaders/RGBELoader.js';
 import Lenis from 'lenis';
-import { pbr, enableAO, manager } from './materials.js?v=48';
-import { buildRotunda, loadProps, ROT_R, ROT_H } from './rotunda.js?v=48';
-import { makeBook } from './book.js?v=48';
+import { pbr, enableAO, manager } from './materials.js?v=49';
+import { buildRotunda, loadProps, ROT_R, ROT_H } from './rotunda.js?v=49';
+import { makeBook } from './book.js?v=49';
 
 const GOLD = 0xf0c877;
 const LAMP = 0xffcf8a;
@@ -360,6 +360,8 @@ let scrollProgress = 0;            // 0..1 damped
 let scrollRaw = 0;
 let pointer = { x: 0, y: 0 };      // -1..1, look-around / orbit offset
 let dragging = false, dragX = 0, dragY = 0;
+let lastOverShelf = false;
+let inRoom = false;          // drives the side panel's visibility
 let pointerHoming = false;   // easing drag offset back to centre after a focus
 
 // Only the handful of bay lamps near the camera stay enabled. Three.js shades
@@ -452,6 +454,13 @@ function updatePointerFromEvent(e) {
   ndc.y = -(e.clientY / window.innerHeight) * 2 + 1;
 }
 
+// True when the cursor is over the island. Used to hold the view still so a
+// book can be aimed at without the room turning under the cursor.
+function overIsland() {
+  raycaster.setFromCamera(ndc, camera);
+  return raycaster.intersectObject(rot.island, true).length > 0;
+}
+
 function pickAt() {
   raycaster.setFromCamera(ndc, camera);
   // Test the island as well, not just the books: otherwise a book on the far face
@@ -485,9 +494,18 @@ window.addEventListener('pointermove', (e) => {
     pointer.y = THREE.MathUtils.clamp(pointer.y + (e.clientY - dragY) * 0.0032, -0.7, 0.7);
     dragX = e.clientX; dragY = e.clientY;
   } else if (scrollProgress > SHELF_START) {
-    // gentle parallax even without dragging
-    pointer.x += ((e.clientX / window.innerWidth - 0.5) * 0.85 - pointer.x) * 0.06;
-    pointer.y += ((0.5 - e.clientY / window.innerHeight) * 0.4 - pointer.y) * 0.06;
+    // Parallax follows the cursor, except over the bookcase itself: aiming at a
+    // spine should not swing the room away from under you. Dragging still turns
+    // the view deliberately.
+    var onShelf = overIsland();
+    if (onShelf !== lastOverShelf) {
+      lastOverShelf = onShelf;
+      document.body.classList.toggle('is-over-shelf', onShelf);
+    }
+    if (!onShelf) {
+      pointer.x += ((e.clientX / window.innerWidth - 0.5) * 0.85 - pointer.x) * 0.06;
+      pointer.y += ((0.5 - e.clientY / window.innerHeight) * 0.4 - pointer.y) * 0.06;
+    }
   }
   if (hoverLabel && !hoverLabel.hidden) {
     hoverLabel.style.transform = `translate(${e.clientX + 16}px, ${e.clientY - 10}px)`;
@@ -698,6 +716,15 @@ function render() {
   if (!updateReading(dt)) {
     placeCamera(scrollProgress);
     camera.lookAt(lookTarget);
+  }
+
+  // The panel used to be sticky inside a one-screen section, so once the orbit
+  // scrolled past that section it slid away. It is fixed now and simply shown
+  // for as long as the camera is in the room.
+  var nowInRoom = scrollProgress > SHELF_START - 0.06;
+  if (nowInRoom !== inRoom) {
+    inRoom = nowInRoom;
+    document.body.classList.toggle('in-room', inRoom);
   }
   cullLights();
 

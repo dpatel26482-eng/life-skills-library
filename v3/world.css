@@ -141,9 +141,9 @@ body.is-loaded #stage-canvas {
 .scroll-cue {
   margin-top: 3rem;
   display: flex; align-items: center; gap: .9rem;
-  font-family: var(--font-ui); font-size: .68rem;
+  font-family: var(--font-ui); font-size: .74rem; font-weight: 600;
   letter-spacing: .24em; text-transform: uppercase;
-  color: rgba(247,239,224,.42);
+  color: var(--gold);                 /* matches the topic line under the title */
 }
 .scroll-cue-line {
   width: 54px; height: 1px;
@@ -153,13 +153,40 @@ body.is-loaded #stage-canvas {
 /* ------------------------------------------------------------- shelf panel */
 .panel--shelf { align-items: center; justify-content: flex-end; }
 .v3-shelf-panel {
-  position: sticky;
+  position: fixed;
   top: 50%;
-  transform: translateY(-50%);
-  margin-right: clamp(1.5rem, 5vw, 5rem);
+  right: clamp(1.5rem, 5vw, 5rem);
+  transform: translateY(-50%) translateX(1.5rem);
+  z-index: 18;
   pointer-events: auto;
   width: min(24rem, 90vw);
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity .5s ease, transform .5s ease, visibility .5s;
 }
+body.in-room .v3-shelf-panel {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(-50%) translateX(0);
+}
+/* the guide covers the room, so the panel steps aside with everything else */
+body.is-reading .v3-shelf-panel { opacity: 0; visibility: hidden; }
+
+/* the instruction carries the same gold as the scroll cue */
+.v3-shelf-panel .shelf-instruction {
+  color: var(--gold);
+  font-weight: 600;
+}
+.v3-shelf-panel .shelf-note {
+  margin: .9rem 0 0;
+  padding-top: .8rem;
+  border-top: 1px solid rgba(240,200,119,.18);
+  font-size: .76rem; line-height: 1.55;
+  color: rgba(247,239,224,.6);
+}
+
+/* a still view deserves a different cursor */
+body.is-over-shelf #stage-canvas { cursor: crosshair; }
 
 /* ------------------------------------------------------------ hover label */
 .hover-label {

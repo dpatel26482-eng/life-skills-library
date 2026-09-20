@@ -23,7 +23,7 @@
             heading: 'What Is Budgeting?',
             paragraphs: [
               'Budgeting is a process in which money is allocated, managed and processed over a specific period of time in a budget. A budget is a plan that tracks income, expenses and savings.',
-              'The purpose of a budget is to give a person control over their money by clearly showing it comes from and where it goes.'
+              'The purpose of a budget is to give a person control over their money by clearly showing where it comes from and where it goes.'
             ]
           },
           right: {
@@ -31,7 +31,7 @@
             kicker: 'Why does it matter?',
             heading: 'Why It Matters',
             paragraphs: [
-              'The root cause of overspending often comes from poor cash flow management. Most people, when they run low on money, will slow their spending. According to ADP approximately in 2025, 52% of Australians are estimated to be living paycheck to paycheck (ADP, 2025), a situation which a 2024 study published by HarmoniEconomics closely linked to limited financial literacy and an inability to budget effectively (Mayndarto,Andrinaldo and Baronkulovich, 2024).'
+              'The root cause of overspending often comes from poor cash flow management. Most people, when they run low on money, will slow their spending. According to ADP, in 2025 approximately 52% of Australians are estimated to be living paycheck to paycheck (ADP, 2025), a situation which a 2024 study published by HarmoniEconomics closely linked to limited financial literacy and an inability to budget effectively (Mayndarto, Andrinaldo and Baronkulovich, 2024).'
             ]
           }
         },
@@ -64,7 +64,7 @@
             kicker: 'What should someone pay attention to?',
             heading: 'What To Pay Attention To',
             paragraphs: [
-              'Simply tracking income and expenses isn&rsquo;t enough, many people who diligently record every transaction still end up unsure what to actually do with that information. What matters more is turning raw numbers into a small set of meaningful checks, such as whether spending stayed within a set percentage for a specific category like dining out or subscription), whether the month ended in a surplus or a deficit, and whether recurring bills and savings goals were consistently met. Some budgeters also track this over longer periods, using quarterly or year-to-date reviews to catch expenses that don&rsquo;t occur every month, rather than relying on a single month&rsquo;s snapshot alone.'
+              'Simply tracking income and expenses isn&rsquo;t enough. Many people who diligently record every transaction still end up unsure what to actually do with that information. What matters more is turning raw numbers into a small set of meaningful checks, such as whether spending stayed within a set percentage for a specific category like dining out or subscriptions, whether the month ended in a surplus or a deficit, and whether recurring bills and savings goals were consistently met. Some budgeters also track this over longer periods, using quarterly or year-to-date reviews to catch expenses that don&rsquo;t occur every month, rather than relying on a single month&rsquo;s snapshot alone.'
             ]
           },
           right: {
@@ -72,7 +72,7 @@
             heading: 'A small set of meaningful checks',
             columns: ['Check'],
             rows: [
-              ['whether spending stayed within a set percentage for a specific category like dining out or subscription)'],
+              ['whether spending stayed within a set percentage for a specific category like dining out or subscriptions'],
               ['whether the month ended in a surplus or a deficit'],
               ['whether recurring bills and savings goals were consistently met']
             ],
@@ -144,7 +144,7 @@
             kicker: 'How to know your success',
             heading: 'Adjusting Over Time',
             paragraphs: [
-              'Spending patterns naturally shift month to month, so when issues do arise, understanding why, and adjusting the budget accordingly is important. Over time, success looks like a growing savings balance and reducing financial stress.'
+              'Spending patterns naturally shift month to month, so when issues do arise, understanding why and adjusting the budget accordingly is important. Over time, success looks like a growing savings balance and reducing financial stress.'
             ]
           }
         },
@@ -282,7 +282,7 @@
           },
           right: {
             type: 'pullquote',
-            quote: 'Budgets are not always an accurate reflection of real spending habits, life is not linear, unforeseen events always arise, but a good budget can help combat and recover from them.',
+            quote: 'Budgets are not always an accurate reflection of real spending habits. Life is not linear and unforeseen events always arise, but a good budget can help combat and recover from them.',
             list: []
           }
         }
