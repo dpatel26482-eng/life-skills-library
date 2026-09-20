@@ -19,9 +19,9 @@ import { ShaderPass } from 'three/addons/postprocessing/ShaderPass.js';
 import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
 import { RGBELoader } from 'three/addons/loaders/RGBELoader.js';
 import Lenis from 'lenis';
-import { pbr, enableAO, manager } from './materials.js?v=51';
-import { buildRotunda, loadProps, ROT_R, ROT_H } from './rotunda.js?v=51';
-import { makeBook } from './book.js?v=51';
+import { pbr, enableAO, manager } from './materials.js?v=54';
+import { buildRotunda, loadProps, ROT_R, ROT_H } from './rotunda.js?v=54';
+import { makeBook } from './book.js?v=54';
 
 const GOLD = 0xf0c877;
 const LAMP = 0xffcf8a;
@@ -474,6 +474,7 @@ function seek(p) {
 }
 
 let pendingOpen = null;      // book to pull once the camera arrives
+let resumeChapter = 0;       // chapter the guide should open at
 
 // Swing the camera round the island until it is square on to a given book.
 function focusBook(id) {
@@ -501,11 +502,11 @@ function focusBook(id) {
 
 // Used by the side panel: travel round to the book, then pull it off the shelf
 // once the camera has actually settled there.
-function travelAndOpen(id) {
+function travelAndOpen(id, chapter) {
   if (reading) return;
   const target = focusBook(id);
   if (target === undefined) return;
-  pendingOpen = { id: id, target: target, since: performance.now() };
+  pendingOpen = { id: id, target: target, since: performance.now(), chapter: chapter || 0 };
 }
 
 // ------------------------------------------------------------------ picking --
@@ -712,7 +713,8 @@ function updateReading(dt) {
       // closed and you want it back.
       setTimeout(() => {
         if (reading && reading.phase === 'read' && !window.LLReader.isOpen()) {
-          window.LLReader.open(r.mesh.userData.id);
+          window.LLReader.open(r.mesh.userData.id, resumeChapter);
+          resumeChapter = 0;
         }
       }, 380);
     } else {
@@ -792,6 +794,7 @@ function render() {
     const arrived = Math.abs(scrollProgress - pendingOpen.target) < 0.012;
     if (arrived || performance.now() - pendingOpen.since > 2600) {
       const id = pendingOpen.id;
+      resumeChapter = pendingOpen.chapter || 0;
       pendingOpen = null;
       pullBook(pickable.find((m) => m.userData.id === id));
     }
@@ -940,6 +943,50 @@ if (topicList) {
   topicList.addEventListener('click', (e) => {
     const btn = e.target.closest('.topic-link');
     if (btn) travelAndOpen(btn.dataset.id);
+  });
+}
+
+// ---------------------------------------------------------------------------
+//  READING PROGRESS RAIL
+// ---------------------------------------------------------------------------
+{
+  const pctEl = document.getElementById('progress-pct');
+  const fillEl = document.getElementById('progress-fill');
+  const subEl = document.getElementById('progress-sub');
+  const contEl = document.getElementById('progress-continue');
+  const whereEl = document.getElementById('continue-where');
+
+  function paintProgress(p) {
+    if (pctEl) pctEl.textContent = p.percent;
+    if (fillEl) fillEl.style.height = p.percent + '%';
+    if (subEl) subEl.textContent = p.done + ' of ' + p.total + ' read';
+
+    if (contEl) {
+      const l = p.last;
+      contEl.hidden = !l;
+      if (l) {
+        const title = window.LLProgress.bookTitle(l.book);
+        const chapter = window.LLProgress.chapterName(l.book, l.chapter);
+        contEl.title = 'Continue: ' + title + ', ' + chapter;
+        if (whereEl) whereEl.textContent = title + ' · ' + chapter;
+      }
+    }
+  }
+
+  window.addEventListener('ll-progress', (e) => paintProgress(e.detail));
+  paintProgress(window.LLProgress.get());
+
+  contEl?.addEventListener('click', () => {
+    const l = window.LLProgress.get().last;
+    if (!l) return;
+    if (window.LLReader.isOpen()) window.LLReader.close();
+    if (reading && reading.phase === 'read') {
+      // already holding a book: put it back, then fetch the saved one
+      closeBookScene();
+      setTimeout(() => travelAndOpen(l.book, l.chapter), 1300);
+    } else {
+      travelAndOpen(l.book, l.chapter);
+    }
   });
 }
 

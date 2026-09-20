@@ -9,7 +9,81 @@
   var isNarrow = function () { return window.innerWidth < 900; };
   var state = { read: {}, answers: {} };
   function $(id) { return document.getElementById(id); }
-  function persist() {}
+  // ---------- reading progress -------------------------------------------
+  // Which chapters have been opened, and where the reader left off. Kept in
+  // localStorage so returning to the site resumes rather than restarts.
+  var STORE = 'lcls-progress-v1';
+  var progress = { visited: {}, last: null };
+
+  try {
+    var saved = JSON.parse(localStorage.getItem(STORE) || 'null');
+    if (saved && typeof saved === 'object') {
+      progress.visited = saved.visited || {};
+      progress.last = saved.last || null;
+    }
+  } catch (err) { /* private browsing or cleared storage: start fresh */ }
+
+  function persist() {
+    try { localStorage.setItem(STORE, JSON.stringify(progress)); }
+    catch (err) { /* nothing to do if storage is unavailable */ }
+  }
+
+  function totalChapters() {
+    return BOOKS.reduce(function (n, b) { return n + b.spreads.length; }, 0);
+  }
+
+  function visitedCount() {
+    var n = 0;
+    for (var id in progress.visited) n += progress.visited[id].length;
+    return n;
+  }
+
+  function markVisited(bookId, index) {
+    var list = progress.visited[bookId] || (progress.visited[bookId] = []);
+    var isNew = list.indexOf(index) === -1;
+    if (isNew) list.push(index);
+    progress.last = { book: bookId, chapter: index };
+    persist();
+    window.dispatchEvent(new CustomEvent('ll-progress', {
+      detail: {
+        done: visitedCount(),
+        total: totalChapters(),
+        percent: Math.round(100 * visitedCount() / totalChapters()),
+        last: progress.last,
+        isNew: isNew
+      }
+    }));
+  }
+
+  window.LLProgress = {
+    get: function () {
+      // copies, not the live objects: callers must not be able to edit progress
+      var copy = {};
+      for (var id in progress.visited) copy[id] = progress.visited[id].slice();
+      return {
+        done: visitedCount(),
+        total: totalChapters(),
+        percent: Math.round(100 * visitedCount() / totalChapters()),
+        last: progress.last ? { book: progress.last.book, chapter: progress.last.chapter } : null,
+        visited: copy
+      };
+    },
+    chapterName: function (bookId, index) {
+      var b = BOOKS.filter(function (x) { return x.id === bookId; })[0];
+      return b && b.spreads[index] ? b.spreads[index].chapter : '';
+    },
+    bookTitle: function (bookId) {
+      var b = BOOKS.filter(function (x) { return x.id === bookId; })[0];
+      return b ? b.title : '';
+    },
+    reset: function () {
+      progress = { visited: {}, last: null };
+      persist();
+      window.dispatchEvent(new CustomEvent('ll-progress', {
+        detail: { done: 0, total: totalChapters(), percent: 0, last: null, isNew: false }
+      }));
+    }
+  };
 
   // ---------- Page block renderers ----------
 
@@ -243,12 +317,12 @@
   var spreadIndex = 0;
   var flipping = false;
 
-  function openBook(id) {
+  function openBook(id, startIndex) {
     var book = BOOKS.filter(function (b) { return b.id === id; })[0];
     if (!book || overlay.classList.contains('is-open')) return;
 
     currentBook = book;
-    spreadIndex = 0;
+    spreadIndex = Math.max(0, Math.min(book.spreads.length - 1, startIndex || 0));
 
     readerEyebrow.textContent = 'Book ' + book.number;
     readerTitle.textContent = book.title;
@@ -297,6 +371,7 @@
 
   function renderSpread() {
     var spread = currentBook.spreads[spreadIndex];
+    markVisited(currentBook.id, spreadIndex);
     pageLeftEl.innerHTML = renderBlock(spread.left, 'left');
     pageRightEl.innerHTML = renderBlock(spread.right, 'right');
     pageLeftEl.scrollTop = 0;

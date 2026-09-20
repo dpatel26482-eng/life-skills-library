@@ -155,7 +155,7 @@ body.is-loaded #stage-canvas {
 .v3-shelf-panel {
   position: fixed;
   top: 50%;
-  right: clamp(1.5rem, 5vw, 5rem);
+  right: clamp(5rem, 8vw, 8.5rem);      /* clears the progress rail */
   transform: translateY(-50%) translateX(1.5rem);
   z-index: 18;
   pointer-events: auto;
@@ -502,4 +502,87 @@ body.is-reading .scroll-track { opacity: 0; transition: opacity .45s ease; }
   background: rgba(107, 79, 32, .06);
   border-radius: 0 6px 6px 0;
   font-size: .78rem; line-height: 1.55;
+}
+
+
+/* =====================================================================
+   READING PROGRESS RAIL
+   Fixed to the right edge. Fills as chapters are opened, and offers a way
+   back to wherever the reader stopped.
+   ===================================================================== */
+.progress-rail {
+  position: fixed;
+  right: clamp(.9rem, 2vw, 1.6rem);
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 24;
+  display: flex; flex-direction: column; align-items: center; gap: .6rem;
+  padding: .9rem .7rem 1rem;
+  border: 1px solid rgba(240,200,119,.16);
+  border-radius: 999px;
+  background: rgba(8,7,6,.62);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity .45s ease, visibility .45s;
+  pointer-events: none;
+}
+/* shown once the walk has begun, and kept up while reading */
+body.in-room .progress-rail,
+body.is-reading .progress-rail { opacity: 1; visibility: visible; pointer-events: auto; }
+
+.progress-count {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 1.05rem; line-height: 1;
+  color: var(--cream);
+}
+.progress-unit { font-size: .62rem; opacity: .55; margin-left: .06rem; }
+
+.progress-track {
+  width: 4px; height: clamp(120px, 22vh, 200px);
+  border-radius: 999px;
+  background: rgba(247,239,224,.12);
+  overflow: hidden;
+  display: flex; align-items: flex-end;
+}
+.progress-fill {
+  display: block; width: 100%; height: 0%;
+  border-radius: 999px;
+  background: linear-gradient(180deg, var(--gold-soft), var(--gold-deep));
+  box-shadow: 0 0 10px rgba(240,200,119,.45);
+  transition: height .55s cubic-bezier(.4,.75,.3,1);
+}
+.progress-sub {
+  margin: 0;
+  writing-mode: vertical-rl;
+  font-family: var(--font-ui);
+  font-size: .58rem; letter-spacing: .18em; text-transform: uppercase;
+  color: rgba(247,239,224,.42);
+  white-space: nowrap;
+}
+
+.progress-continue {
+  display: flex; flex-direction: column; align-items: center; gap: .1rem;
+  margin-top: .2rem; padding: .5rem .55rem;
+  border: 1px solid rgba(240,200,119,.42);
+  border-radius: 999px;
+  background: rgba(240,200,119,.1);
+  color: var(--gold-soft);
+  cursor: pointer;
+  transition: background .25s ease, border-color .25s ease;
+}
+.progress-continue:hover { background: rgba(240,200,119,.22); border-color: var(--gold-soft); }
+.continue-label {
+  writing-mode: vertical-rl;
+  font-family: var(--font-ui);
+  font-size: .6rem; font-weight: 700; letter-spacing: .18em; text-transform: uppercase;
+}
+.continue-where { display: none; }
+
+@media (max-width: 760px) {
+  .progress-rail { right: .5rem; padding: .7rem .5rem .8rem; }
+  .progress-track { height: 90px; }
+  .progress-sub { display: none; }
 }

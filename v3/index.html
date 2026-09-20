@@ -11,7 +11,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Spectral:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Work+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="styles.css?v=4">
-<link rel="stylesheet" href="world.css?v=51">
+<link rel="stylesheet" href="world.css?v=54">
 <script type="importmap">
 {
   "imports": {
@@ -79,6 +79,17 @@
 </main>
 
 <p class="hover-label" id="hover-label" hidden></p>
+
+<!-- reading progress, and a way back to where you left off -->
+<aside class="progress-rail" id="progress-rail" aria-label="Reading progress">
+  <p class="progress-count"><span id="progress-pct">0</span><span class="progress-unit">%</span></p>
+  <div class="progress-track"><span class="progress-fill" id="progress-fill"></span></div>
+  <p class="progress-sub" id="progress-sub">0 of 21 read</p>
+  <button type="button" class="progress-continue" id="progress-continue" hidden>
+    <span class="continue-label">Continue</span>
+    <span class="continue-where" id="continue-where"></span>
+  </button>
+</aside>
 
 <!-- kept for state only: the Explore / Go back words are printed on the pages -->
 <div class="book-hud" id="book-hud" aria-hidden="true"></div>
@@ -151,7 +162,7 @@
 </div>
 
 <script src="books-data.js?v=5"></script>
-<script src="reader.js?v=51"></script>
-<script type="module" src="world.js?v=51"></script>
+<script src="reader.js?v=54"></script>
+<script type="module" src="world.js?v=54"></script>
 </body>
 </html>
