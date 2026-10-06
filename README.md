@@ -4,7 +4,19 @@ A 3D scroll-driven guide to budgeting, tax and superannuation. Walk down a libra
 hall, arrive in a circular reading room, orbit the bookcase and pull a book off the
 shelf to read it.
 
-**Live:** https://deploy-henna-six-81.vercel.app
+**Live:** https://life-skills-library-claude-34ad.vercel.app
+
+Two other URLs point at the same project and are easy to confuse:
+
+| URL | What it tracks |
+|---|---|
+| `life-skills-library-claude-34ad.vercel.app` | production. Share this one. |
+| `life-skills-library-git-main-claude-34ad.vercel.app` | always the newest build of `main` |
+| `life-skills-library-<build id>-claude-34ad.vercel.app` | one frozen build, never changes |
+
+The old `deploy-henna-six-81.vercel.app` was a hand uploaded copy of the `deploy/`
+folder from before the GitHub connection existed. That project is gone and the URL
+now returns DEPLOYMENT_NOT_FOUND. It is not the site.
 
 ## What it is
 
