@@ -19,9 +19,9 @@ import { ShaderPass } from 'three/addons/postprocessing/ShaderPass.js';
 import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
 import { RGBELoader } from 'three/addons/loaders/RGBELoader.js';
 import Lenis from 'lenis';
-import { pbr, enableAO, manager } from './materials.js?v=59';
-import { buildRotunda, loadProps, ROT_R, ROT_H } from './rotunda.js?v=59';
-import { makeBook } from './book.js?v=59';
+import { pbr, enableAO, manager } from './materials.js?v=61';
+import { buildRotunda, loadProps, ROT_R, ROT_H } from './rotunda.js?v=61';
+import { makeBook } from './book.js?v=61';
 
 const GOLD = 0xf0c877;
 const LAMP = 0xffcf8a;
@@ -262,27 +262,21 @@ loadProps(rot.group, (l) => { chandelierLight = l; })
 scene.add(new THREE.AmbientLight(0x33281c, 1.9));
 
 // ------------------------------------------------------------------ motes --
-const moteCount = 460;
+const moteCount = 520;
 const motePos = new Float32Array(moteCount * 3);
 const moteSeed = new Float32Array(moteCount);
-// The dust used to be seeded into the corridor volume only, so once the camera
-// reached the reading room every mote was behind it: they read as one distant
-// clump hanging in the hall mouth, then vanished entirely as the orbit came
-// round. Seeding both volumes keeps a few drifting through the middle of the
-// view wherever you are. Radius is linear in r rather than sqrt(r) so the drum
-// is denser toward its centre than at the wall.
+// Splitting the dust between the two rooms traded one problem for another: the
+// reading room got motes, but the corridor lost half of them and the room's
+// share collapsed into a clump on the vanishing point when seen from the hall.
+// Instead the field is a single box that travels with the camera, wrapped in
+// the shader, so the viewer is always inside a full density of dust wherever
+// they are. X and Z wrap; Y stays absolute so motes keep rising floor to
+// ceiling rather than sliding about underfoot.
+const MOTE_BOX_X = 24, MOTE_BOX_Z = 40;
 for (let i = 0; i < moteCount; i++) {
-  if (i % 20 < 11) {                                  // 55% stay in the corridor
-    motePos[i * 3] = (Math.random() - 0.5) * (HALL_W + 1);
-    motePos[i * 3 + 1] = Math.random() * HALL_H;
-    motePos[i * 3 + 2] = -Math.random() * HALL_LEN;
-  } else {                                            // 45% hang in the rotunda
-    const a = Math.random() * Math.PI * 2;
-    const r = Math.random() * (ROT_R - 2);
-    motePos[i * 3] = Math.cos(a) * r;
-    motePos[i * 3 + 1] = Math.random() * HALL_H;       // same ceiling, so the drift wraps the same
-    motePos[i * 3 + 2] = SHELF_Z + Math.sin(a) * r;
-  }
+  motePos[i * 3] = Math.random() * MOTE_BOX_X;
+  motePos[i * 3 + 1] = Math.random() * HALL_H;
+  motePos[i * 3 + 2] = Math.random() * MOTE_BOX_Z;
   moteSeed[i] = Math.random() * 100;
 }
 const moteGeo = new THREE.BufferGeometry();
@@ -296,6 +290,8 @@ const moteMat = new THREE.ShaderMaterial({
     uTime: { value: 0 },
     uColour: { value: new THREE.Color(GOLD) },
     uCeiling: { value: HALL_H },
+    uCam: { value: new THREE.Vector3() },
+    uBox: { value: new THREE.Vector2(MOTE_BOX_X, MOTE_BOX_Z) },
     // PointsMaterial sized points as size * pixelRatio * (height / 2) / -z. The
     // hand written shader had a fixed 420 in that slot, which made the motes
     // shrink on a retina screen and swell when the adaptive renderer dropped
@@ -310,12 +306,21 @@ const moteMat = new THREE.ShaderMaterial({
     uniform float uTime;
     uniform float uCeiling;
     uniform float uScale;
+    uniform vec3 uCam;
+    uniform vec2 uBox;
     void main() {
       vec3 p = position;
       float rise = 0.09 + fract(aSeed) * 0.13;
       p.y = mod(p.y + uTime * rise, uCeiling);
       p.x += sin(uTime * 0.4 + aSeed) * 0.22;
-      vec4 mv = modelViewMatrix * vec4(p, 1.0);
+
+      // Tile the field around the camera: each mote is placed in whichever copy
+      // of the box the viewer currently occupies, so the dust is seamless and
+      // never thins out or bunches up no matter how far the camera travels.
+      vec2 rel = mod(p.xz - uCam.xz + uBox * 0.5, uBox) - uBox * 0.5;
+      vec3 world = vec3(uCam.x + rel.x, p.y, uCam.z + rel.y);
+
+      vec4 mv = modelViewMatrix * vec4(world, 1.0);
       gl_PointSize = 0.045 * (uScale / -mv.z);
       gl_Position = projectionMatrix * mv;
     }
@@ -331,10 +336,10 @@ const moteMat = new THREE.ShaderMaterial({
   `
 });
 const motes = new THREE.Points(moteGeo, moteMat);
-// The shader sways each mote by up to 0.22 on x, which the automatic bounds do
-// not know about; pad them so nothing pops out at the edge of the frustum.
-moteGeo.computeBoundingSphere();
-moteGeo.boundingSphere.radius += 0.5;
+// The shader relocates every mote around the camera, so the geometry's own
+// bounds mean nothing and would cull the whole field the moment the camera
+// left the box the points were seeded in.
+motes.frustumCulled = false;
 function syncMoteScale() {
   moteMat.uniforms.uScale.value = renderer.getPixelRatio() * window.innerHeight * 0.5;
 }
@@ -890,6 +895,7 @@ function render() {
   if (frames % 6 === 0) budgetLights();   // positions barely change frame to frame
 
   moteMat.uniforms.uTime.value = t;
+  moteMat.uniforms.uCam.value.copy(camera.position);
 
   // lit books breathe
   for (const m of pickable) {
