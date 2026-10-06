@@ -528,7 +528,11 @@ body.is-reading .scroll-track { opacity: 0; transition: opacity .45s ease; }
   transition: opacity .45s ease, visibility .45s;
   pointer-events: none;
 }
-/* shown once the walk has begun, and kept up while reading */
+/* Up for the whole journey, not just inside the reading room. Progress is worth
+   seeing while you are still walking toward the shelf, and a bar that appears
+   halfway through reads as something breaking rather than something arriving.
+   Gated on is-loaded so it fades in with the scene, not over the loading screen. */
+body.is-loaded .progress-rail,
 body.in-room .progress-rail,
 body.is-reading .progress-rail { opacity: 1; visibility: visible; pointer-events: auto; }
 
