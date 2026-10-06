@@ -86,8 +86,12 @@ export function box(w, h, d, radius = 0.02, segments = 3) {
  * Draw a book-spine label to a canvas and return it as a texture.
  * Text is rendered rotated so it runs bottom-to-top like a real spine.
  */
-export function spineLabel(text, { fg = '#f3dcae', bg = null } = {}) {
-  const W = 128, H = 512;
+export function spineLabel(text, { fg = '#fff4e0', bg = null } = {}) {
+  // A spine fills a good part of the screen when you orbit up to the case, and
+  // at 128x512 the lettering ran out of texels and went soft. Drawn at 4x and
+  // read back with full anisotropy it stays crisp at the closest the camera gets.
+  const S = 4;
+  const W = 128 * S, H = 512 * S;
   const c = document.createElement('canvas');
   c.width = W; c.height = H;
   const x = c.getContext('2d');
@@ -100,16 +104,24 @@ export function spineLabel(text, { fg = '#f3dcae', bg = null } = {}) {
   x.textAlign = 'center';
   x.textBaseline = 'middle';
 
-  x.font = '600 42px "Work Sans", system-ui, sans-serif';
-  x.letterSpacing = '6px';
-  x.shadowColor = 'rgba(0,0,0,.85)';
-  x.shadowBlur = 8;
+  x.font = `600 ${42 * S}px "Work Sans", system-ui, sans-serif`;
+  x.letterSpacing = `${6 * S}px`;
+  // A tight, dark drop shadow lifts the letters off the board without the halo
+  // that a wide blur leaves around every stroke.
+  x.shadowColor = 'rgba(0,0,0,.9)';
+  x.shadowBlur = 3 * S;
   x.fillStyle = fg;
   x.fillText(text.toUpperCase(), 0, 0);
+  x.shadowBlur = 0;
+  x.fillText(text.toUpperCase(), 0, 0);   // second pass: solid strokes, no shadow wash
 
   const t = new THREE.CanvasTexture(c);
   t.colorSpace = THREE.SRGBColorSpace;
-  t.anisotropy = 8;
+  t.anisotropy = 16;
+  t.generateMipmaps = true;
+  t.minFilter = THREE.LinearMipmapLinearFilter;
+  t.magFilter = THREE.LinearFilter;
+  t.needsUpdate = true;
   return t;
 }
 
