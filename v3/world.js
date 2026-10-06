@@ -19,9 +19,9 @@ import { ShaderPass } from 'three/addons/postprocessing/ShaderPass.js';
 import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
 import { RGBELoader } from 'three/addons/loaders/RGBELoader.js';
 import Lenis from 'lenis';
-import { pbr, enableAO, manager } from './materials.js?v=54';
-import { buildRotunda, loadProps, ROT_R, ROT_H } from './rotunda.js?v=54';
-import { makeBook } from './book.js?v=54';
+import { pbr, enableAO, manager } from './materials.js?v=57';
+import { buildRotunda, loadProps, ROT_R, ROT_H } from './rotunda.js?v=57';
+import { makeBook } from './book.js?v=57';
 
 const GOLD = 0xf0c877;
 const LAMP = 0xffcf8a;
@@ -142,16 +142,23 @@ function buildHallInstanced() {
     v.set(0, HALL_H - 0.75, z);
     beams.setMatrixAt(b, m.compose(v, q, one));
 
+    // Lamps alternate sides of the corridor rather than running as one row down
+    // the centre line. Down a long hall a centred row collapses in perspective
+    // into a single column of beads converging on the vanishing point; staggered,
+    // they spread across the width and drop their light on the shelves instead of
+    // the middle of the floor.
+    const lampX = (b % 2 === 0 ? -1 : 1) * 2.3;
+
     const globeY = HALL_H - 2.3, globeZ = z + BAY_GAP * 0.5;
-    v.set(0, globeY, globeZ);
+    v.set(lampX, globeY, globeZ);
     globes.setMatrixAt(b, m.compose(v, q, one));
 
-    v.set(0, HALL_H - 5.2, globeZ);
+    v.set(lampX, HALL_H - 5.2, globeZ);
     shafts.setMatrixAt(b, m.compose(v, q, one));
 
     // lights stay real objects — they are culled by distance every frame
     const lamp = new THREE.PointLight(LAMP, 30, 24, 2);
-    lamp.position.set(0, globeY, globeZ);
+    lamp.position.set(lampX, globeY, globeZ);
     lamp.userData.budget = true;         // culled by distance, see budgetLights()
     hall.add(lamp);
   }
@@ -258,10 +265,24 @@ scene.add(new THREE.AmbientLight(0x33281c, 1.9));
 const moteCount = 460;
 const motePos = new Float32Array(moteCount * 3);
 const moteSeed = new Float32Array(moteCount);
+// The dust used to be seeded into the corridor volume only, so once the camera
+// reached the reading room every mote was behind it: they read as one distant
+// clump hanging in the hall mouth, then vanished entirely as the orbit came
+// round. Seeding both volumes keeps a few drifting through the middle of the
+// view wherever you are. Radius is linear in r rather than sqrt(r) so the drum
+// is denser toward its centre than at the wall.
 for (let i = 0; i < moteCount; i++) {
-  motePos[i * 3] = (Math.random() - 0.5) * (HALL_W + 1);
-  motePos[i * 3 + 1] = Math.random() * HALL_H;
-  motePos[i * 3 + 2] = -Math.random() * HALL_LEN;
+  if (i % 20 < 11) {                                  // 55% stay in the corridor
+    motePos[i * 3] = (Math.random() - 0.5) * (HALL_W + 1);
+    motePos[i * 3 + 1] = Math.random() * HALL_H;
+    motePos[i * 3 + 2] = -Math.random() * HALL_LEN;
+  } else {                                            // 45% hang in the rotunda
+    const a = Math.random() * Math.PI * 2;
+    const r = Math.random() * (ROT_R - 2);
+    motePos[i * 3] = Math.cos(a) * r;
+    motePos[i * 3 + 1] = Math.random() * HALL_H;       // same ceiling, so the drift wraps the same
+    motePos[i * 3 + 2] = SHELF_Z + Math.sin(a) * r;
+  }
   moteSeed[i] = Math.random() * 100;
 }
 const moteGeo = new THREE.BufferGeometry();
@@ -274,7 +295,12 @@ const moteMat = new THREE.ShaderMaterial({
   uniforms: {
     uTime: { value: 0 },
     uColour: { value: new THREE.Color(GOLD) },
-    uCeiling: { value: HALL_H }
+    uCeiling: { value: HALL_H },
+    // PointsMaterial sized points as size * pixelRatio * (height / 2) / -z. The
+    // hand written shader had a fixed 420 in that slot, which made the motes
+    // shrink on a retina screen and swell when the adaptive renderer dropped
+    // the pixel ratio. Track the real buffer instead.
+    uScale: { value: 1 }
   },
   transparent: true,
   depthWrite: false,
@@ -283,13 +309,14 @@ const moteMat = new THREE.ShaderMaterial({
     attribute float aSeed;
     uniform float uTime;
     uniform float uCeiling;
+    uniform float uScale;
     void main() {
       vec3 p = position;
       float rise = 0.09 + fract(aSeed) * 0.13;
       p.y = mod(p.y + uTime * rise, uCeiling);
       p.x += sin(uTime * 0.4 + aSeed) * 0.22;
       vec4 mv = modelViewMatrix * vec4(p, 1.0);
-      gl_PointSize = 0.045 * (420.0 / -mv.z);
+      gl_PointSize = 0.045 * (uScale / -mv.z);
       gl_Position = projectionMatrix * mv;
     }
   `,
@@ -304,6 +331,14 @@ const moteMat = new THREE.ShaderMaterial({
   `
 });
 const motes = new THREE.Points(moteGeo, moteMat);
+// The shader sways each mote by up to 0.22 on x, which the automatic bounds do
+// not know about; pad them so nothing pops out at the edge of the frustum.
+moteGeo.computeBoundingSphere();
+moteGeo.boundingSphere.radius += 0.5;
+function syncMoteScale() {
+  moteMat.uniforms.uScale.value = renderer.getPixelRatio() * window.innerHeight * 0.5;
+}
+syncMoteScale();
 scene.add(motes);
 
 // =============================================================================
@@ -430,6 +465,30 @@ function budgetLights() {
   }
   _scored.sort((a, b) => a.d - b.d);
   for (let i = 0; i < _scored.length; i++) _scored[i].l.visible = i < LIGHT_BUDGET;
+}
+
+// Three.js compiles a shader program the first time a material/light/shadow
+// combination is actually drawn, so the first trip down the hall pays for each
+// new combination as it scrolls into view. Walking the camera once while the
+// loader is still up moves all of that off the scroll.
+function precompilePrograms() {
+  const pos = camera.position.clone();
+  const quat = camera.quaternion.clone();
+  try {
+    for (const p of [0, 0.2, 0.4, 0.6, 0.8, 1]) {
+      placeCamera(p);
+      camera.lookAt(lookTarget);
+      camera.updateMatrixWorld(true);
+      budgetLights();
+      renderer.compile(scene, camera);
+    }
+  } catch (err) {
+    console.warn('precompile skipped:', err);
+  }
+  camera.position.copy(pos);
+  camera.quaternion.copy(quat);
+  camera.updateMatrixWorld(true);
+  restampShadows(3);
 }
 
 function placeCamera(p) {
@@ -891,6 +950,7 @@ function tuneResolution(now, frameMs) {
   }
   renderer.setPixelRatio(DPR_STEPS[dprIndex]);
   composer.setPixelRatio?.(DPR_STEPS[dprIndex]);
+  syncMoteScale();
   restampShadows(2);
 }
 
@@ -911,6 +971,7 @@ window.addEventListener('resize', () => {
   renderer.setSize(window.innerWidth, window.innerHeight);
   composer.setSize(window.innerWidth, window.innerHeight);
   bloom.setSize(window.innerWidth / 2, window.innerHeight / 2);
+  syncMoteScale();
   restampShadows(2);
 });
 
@@ -1060,6 +1121,7 @@ if (topicList) {
     if (shown === 1) {
       // hand over: blur resolves to zero and the overlay lifts
       document.documentElement.style.setProperty('--load-blur', '0px');
+      precompilePrograms();        // stall here, behind the loader, not mid-scroll
       loaderEl?.classList.add('is-gone');
       document.body.classList.add('is-loaded');
       clearInterval(tick);
