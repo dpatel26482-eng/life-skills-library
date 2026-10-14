@@ -337,13 +337,27 @@ body.is-reading .scroll-track { opacity: 0; transition: opacity .45s ease; }
 .book-reader .leaf {
   will-change: transform;
 }
+/* The shared face rule used to carry transform: translateZ(0) to force its own
+   layer. At (0,2,0) that outranked `.leaf-back { transform: rotateY(180deg) }`
+   at (0,1,0) and silently wiped the half turn off the back face, so both faces
+   pointed the same way. With backface-visibility: hidden on both, everything
+   past 90 degrees was invisible and the pale spread showed through: the white
+   flash at the crease. Promote with will-change instead, which does not touch
+   the transform, and restate each face's rotation at matching specificity. */
 .book-reader .leaf-face {
   border-radius: 0 16px 16px 0;
   backface-visibility: hidden;
   -webkit-backface-visibility: hidden;
-  transform: translateZ(0);                 /* own layer: stops repaint tearing */
+  will-change: transform;
 }
-.book-reader .leaf-back { border-radius: 16px 0 0 16px; }
+.book-reader .leaf-front { transform: rotateY(0deg); }
+.book-reader .leaf-back {
+  border-radius: 16px 0 0 16px;
+  transform: rotateY(180deg);
+}
+/* A page seen edge on should not glow. The 40px halo flared at the crease as
+   the leaf passed through vertical; a tighter, offset shadow reads as paper. */
+.book-reader .leaf-face { box-shadow: 0 14px 34px rgba(0, 0, 0, .34); }
 
 
 /* ---- type: one family for chrome and page furniture --------------------

@@ -421,7 +421,11 @@
     if (spreadIndex === last && !state.read[currentBook.id]) {
       state.read[currentBook.id] = true;
       persist();
-      buildBookList();
+      // buildBookList lives in script.js, which only the v2 page loads. In v3 the
+      // call threw a ReferenceError the first time a reader reached the end of a
+      // book, and since renderSpread runs before the leaf is populated, the throw
+      // took the whole page turn down with it.
+      if (typeof buildBookList === 'function') buildBookList();
     }
 
     var pos = spread.chapter + ' · ' + (spreadIndex + 1) + ' of ' + currentBook.spreads.length;
@@ -435,8 +439,13 @@
     next = Math.max(0, Math.min(last, next));
     if (next === spreadIndex) return;
 
-    var oldLeft = pageLeftEl.innerHTML;
-    var oldRight = pageRightEl.innerHTML;
+    // Clone the live nodes rather than copying innerHTML. Re-parsing HTML builds
+    // fresh <img> elements that start from nothing, so a page carrying a figure
+    // turned with a blank rectangle on it; a cloned node reuses the decoded
+    // image. Lazy loading is also forced off, since an image inserted mid turn
+    // can otherwise sit undecided for a frame or two.
+    var oldLeft = snapshot(pageLeftEl);
+    var oldRight = snapshot(pageRightEl);
 
     spreadIndex = next;
     renderSpread();
@@ -444,25 +453,45 @@
     if (reduceMotion || isNarrow()) return;
 
     flipping = true;
-    if (dir > 0) {
-      leafFront.innerHTML = oldRight;
-      leafBack.innerHTML = pageLeftEl.innerHTML;
-    } else {
-      leafFront.innerHTML = pageRightEl.innerHTML;
-      leafBack.innerHTML = oldLeft;
-    }
+    fillFace(leafFront, dir > 0 ? oldRight : snapshot(pageRightEl));
+    fillFace(leafBack, dir > 0 ? snapshot(pageLeftEl) : oldLeft);
+
     leafEl.classList.add('is-flipping');
     leafEl.style.transition = 'none';
     leafEl.style.transform = 'rotateY(' + (dir > 0 ? 0 : -180) + 'deg)';
     leafEl.offsetHeight;
     leafEl.style.transition = 'transform .76s cubic-bezier(.4,.75,.3,1)';
     leafEl.style.transform = 'rotateY(' + (dir > 0 ? -180 : 0) + 'deg)';
-    setTimeout(function () {
+
+    // End on the transition itself, with the timer only as a backstop. A fixed
+    // timer alone either tore the leaf down early or left it up, depending on
+    // how busy the machine was when the turn started.
+    var done = false;
+    function settle() {
+      if (done) return;
+      done = true;
+      leafEl.removeEventListener('transitionend', onEnd);
       leafEl.classList.remove('is-flipping');
-      leafFront.innerHTML = '';
-      leafBack.innerHTML = '';
+      leafFront.replaceChildren();
+      leafBack.replaceChildren();
       flipping = false;
-    }, 780);
+    }
+    function onEnd(e) { if (e.target === leafEl && e.propertyName === 'transform') settle(); }
+    leafEl.addEventListener('transitionend', onEnd);
+    setTimeout(settle, 1100);
+  }
+
+  // live child nodes, detached and safe to hand to a leaf face
+  function snapshot(el) {
+    return Array.prototype.map.call(el.childNodes, function (n) { return n.cloneNode(true); });
+  }
+
+  function fillFace(face, nodes) {
+    face.replaceChildren.apply(face, nodes);
+    Array.prototype.forEach.call(face.querySelectorAll('img'), function (img) {
+      img.loading = 'eager';
+    });
+    face.scrollTop = 0;
   }
 
   function step(dir) { turnTo(spreadIndex + dir, dir); }
