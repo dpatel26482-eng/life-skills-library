@@ -19,12 +19,24 @@ import { ShaderPass } from 'three/addons/postprocessing/ShaderPass.js';
 import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
 import { RGBELoader } from 'three/addons/loaders/RGBELoader.js';
 import Lenis from 'lenis';
-import { pbr, enableAO, manager } from './materials.js?v=65';
-import { buildRotunda, loadProps, ROT_R, ROT_H } from './rotunda.js?v=65';
-import { makeBook } from './book.js?v=65';
+import { pbr, enableAO, manager } from './materials.js?v=66';
+import { buildRotunda, loadProps, ROT_R, ROT_H } from './rotunda.js?v=66';
+import { makeBook } from './book.js?v=66';
 
 const GOLD = 0xf0c877;
 const LAMP = 0xffcf8a;
+
+// Visiting with ?reset on the end of the URL wipes saved reading progress, so
+// the site can be handed to someone fresh, or taken back to zero, without
+// anyone having to open developer tools. The flag is stripped from the address
+// bar straight afterwards so a refresh does not wipe it a second time.
+if (/[?&]reset(=|&|$)/.test(window.location.search)) {
+  try {
+    if (window.LLProgress && window.LLProgress.reset) window.LLProgress.reset();
+    else localStorage.removeItem('lcls-progress-v1');
+  } catch (_) {}
+  try { history.replaceState(null, '', window.location.pathname); } catch (_) {}
+}
 
 const canvas = document.getElementById('stage-canvas');
 const hoverLabel = document.getElementById('hover-label');
@@ -1173,17 +1185,16 @@ if (topicList) {
 //  arrives in a dark corridor with no idea that it scrolls or that the books
 //  open. The typed confirmation is a read receipt, not security.
 // =============================================================================
-const INTRO_KEY = 'lcls-intro-v1';
+// Shown on every visit, not once per browser. Most people meet this site a
+// handful of times at most, and someone returning after a week needs the
+// instructions more than someone who read them ten minutes ago, not less.
 const INTRO_WORD = 'understand';
 let introOpen = false;
 let introBound = false;        // listeners attach once, however often it is shown
 
-function openIntro({ force = false } = {}) {
+function openIntro() {
   const el = document.getElementById('intro');
   if (!el || introOpen) return;
-  if (!force) {
-    try { if (localStorage.getItem(INTRO_KEY)) return; } catch (_) {}
-  }
 
   const input = document.getElementById('intro-input');
   const go = document.getElementById('intro-go');
@@ -1241,7 +1252,6 @@ function openIntro({ force = false } = {}) {
 function closeIntro() {
   const el = document.getElementById('intro');
   if (!el) return;
-  try { localStorage.setItem(INTRO_KEY, String(Date.now())); } catch (_) {}
   el.classList.add('is-leaving');
   el.classList.remove('is-open');
   setTimeout(() => {
@@ -1253,8 +1263,8 @@ function closeIntro() {
   }, 620);
 }
 
-// so it can be shown again from the console, or wired to a help control later
-window.LLIntro = { show: () => openIntro({ force: true }), reset: () => { try { localStorage.removeItem(INTRO_KEY); } catch (_) {} } };
+// so it can be reopened from the console, or wired to a help control later
+window.LLIntro = { show: () => openIntro() };
 
 // =============================================================================
 //  ASSET SEAM
