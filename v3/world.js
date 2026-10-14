@@ -19,9 +19,9 @@ import { ShaderPass } from 'three/addons/postprocessing/ShaderPass.js';
 import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
 import { RGBELoader } from 'three/addons/loaders/RGBELoader.js';
 import Lenis from 'lenis';
-import { pbr, enableAO, manager } from './materials.js?v=66';
-import { buildRotunda, loadProps, ROT_R, ROT_H } from './rotunda.js?v=66';
-import { makeBook } from './book.js?v=66';
+import { pbr, enableAO, manager } from './materials.js?v=67';
+import { buildRotunda, loadProps, ROT_R, ROT_H } from './rotunda.js?v=67';
+import { makeBook } from './book.js?v=67';
 
 const GOLD = 0xf0c877;
 const LAMP = 0xffcf8a;
