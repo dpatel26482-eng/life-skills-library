@@ -11,7 +11,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Spectral:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Work+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="styles.css?v=4">
-<link rel="stylesheet" href="world.css?v=62">
+<link rel="stylesheet" href="world.css?v=64">
 <script type="importmap">
 {
   "imports": {
@@ -32,6 +32,73 @@
     <p class="loader-mark">Opening the library</p>
     <div class="loader-bar"><span class="loader-bar-fill" id="loader-bar-fill"></span></div>
     <p class="loader-pct" id="loader-pct">0%</p>
+  </div>
+</div>
+
+<!-- ================= INTRODUCTION GATE =================
+     Shown once the scene has loaded, before the visitor can move. Warmer than
+     the library itself on purpose, so it reads as a note handed to you at the
+     door rather than part of the room. -->
+<div class="intro" id="intro" role="dialog" aria-modal="true" aria-labelledby="intro-title" hidden>
+  <div class="intro-backdrop"></div>
+
+  <div class="intro-panel" role="document">
+    <p class="intro-eyebrow">Before you begin</p>
+    <h2 class="intro-title" id="intro-title">Learning Common Life Skill <em>Guide</em></h2>
+
+    <p class="intro-lede">
+      A short guide to three money skills you will need the moment you start
+      earning: budgeting, tax and superannuation.
+    </p>
+
+    <ol class="intro-steps">
+      <li>
+        <span class="intro-num">01</span>
+        <div>
+          <h3>What is inside</h3>
+          <p>Three guides, twenty one chapters in all. Plain explanations, worked
+             examples, activities that mark your answers, a glossary, and a
+             budgeting spreadsheet you can copy.</p>
+        </div>
+      </li>
+      <li>
+        <span class="intro-num">02</span>
+        <div>
+          <h3>Moving through it</h3>
+          <p>Scroll forward to walk down the hall. The arrow keys work too. The
+             walk ends in a round reading room.</p>
+        </div>
+      </li>
+      <li>
+        <span class="intro-num">03</span>
+        <div>
+          <h3>Opening a guide</h3>
+          <p>Click a lit book on the shelf. It lifts off the shelf and opens on
+             its own. Shelve it when you are done to come back to the room.</p>
+        </div>
+      </li>
+      <li>
+        <span class="intro-num">04</span>
+        <div>
+          <h3>Keeping your place</h3>
+          <p>The bar on the right fills as you read. Continue takes you back to
+             the last page you had open.</p>
+        </div>
+      </li>
+    </ol>
+
+    <form class="intro-gate" id="intro-gate" novalidate>
+      <label class="intro-label" for="intro-input">
+        Type <strong>understand</strong> to begin
+      </label>
+      <div class="intro-field">
+        <input class="intro-input" id="intro-input" type="text" name="confirm"
+               autocomplete="off" autocapitalize="off" spellcheck="false"
+               placeholder="understand" aria-describedby="intro-hint">
+        <button class="intro-go" id="intro-go" type="submit" disabled>Begin</button>
+      </div>
+      <p class="intro-hint" id="intro-hint" aria-live="polite"></p>
+    </form>
   </div>
 </div>
 
@@ -162,7 +229,7 @@
 </div>
 
 <script src="books-data.js?v=5"></script>
-<script src="reader.js?v=62"></script>
-<script type="module" src="world.js?v=62"></script>
+<script src="reader.js?v=64"></script>
+<script type="module" src="world.js?v=64"></script>
 </body>
 </html>

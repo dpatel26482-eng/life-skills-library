@@ -19,9 +19,9 @@ import { ShaderPass } from 'three/addons/postprocessing/ShaderPass.js';
 import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
 import { RGBELoader } from 'three/addons/loaders/RGBELoader.js';
 import Lenis from 'lenis';
-import { pbr, enableAO, manager } from './materials.js?v=62';
-import { buildRotunda, loadProps, ROT_R, ROT_H } from './rotunda.js?v=62';
-import { makeBook } from './book.js?v=62';
+import { pbr, enableAO, manager } from './materials.js?v=64';
+import { buildRotunda, loadProps, ROT_R, ROT_H } from './rotunda.js?v=64';
+import { makeBook } from './book.js?v=64';
 
 const GOLD = 0xf0c877;
 const LAMP = 0xffcf8a;
@@ -827,7 +827,37 @@ window.addEventListener('ll-reader-closed', () => {
 // Lenis listens for wheel on the window, so while the guide is open it swallows
 // the wheel before the page's own scroll container ever sees it — which is why
 // only the arrow keys worked. Park it for the duration.
-window.addEventListener('ll-reader-opened', () => lenis.stop());
+let readerOpen = false;
+window.addEventListener('ll-reader-opened', () => { readerOpen = true; lenis.stop(); });
+window.addEventListener('ll-reader-closed', () => { readerOpen = false; });
+
+// Keyboard walking. The introduction tells people the arrow keys work, so they
+// have to actually work: native key scrolling fights Lenis, so drive Lenis
+// directly instead and let it ease the same way the wheel does.
+window.addEventListener('keydown', (e) => {
+  if (introOpen || readerOpen) return;
+  if (e.metaKey || e.ctrlKey || e.altKey) return;
+  const el = e.target;
+  if (el && (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA' || el.isContentEditable)) return;
+
+  const page = window.innerHeight * 0.9;
+  const step = window.innerHeight * 0.45;
+  const limit = document.documentElement.scrollHeight - window.innerHeight;
+  let to = null;
+
+  switch (e.key) {
+    case 'ArrowDown':  case 'ArrowRight': to = lenis.scroll + step; break;
+    case 'ArrowUp':    case 'ArrowLeft':  to = lenis.scroll - step; break;
+    case 'PageDown':                      to = lenis.scroll + page; break;
+    case 'PageUp':                        to = lenis.scroll - page; break;
+    case ' ':                             to = lenis.scroll + (e.shiftKey ? -page : page); break;
+    case 'Home':                          to = 0; break;
+    case 'End':                           to = limit; break;
+    default: return;
+  }
+  e.preventDefault();
+  lenis.scrollTo(Math.max(0, Math.min(limit, to)), { duration: 0.85 });
+});
 
 // =============================================================================
 //  LOOP
@@ -1131,10 +1161,100 @@ if (topicList) {
       loaderEl?.classList.add('is-gone');
       document.body.classList.add('is-loaded');
       clearInterval(tick);
+      openIntro();
     }
   }
   paint();
 }
+
+// =============================================================================
+//  INTRODUCTION GATE
+//  Held in front of the scene until the visitor types the word, so nobody
+//  arrives in a dark corridor with no idea that it scrolls or that the books
+//  open. The typed confirmation is a read receipt, not security.
+// =============================================================================
+const INTRO_KEY = 'lcls-intro-v1';
+const INTRO_WORD = 'understand';
+let introOpen = false;
+let introBound = false;        // listeners attach once, however often it is shown
+
+function openIntro({ force = false } = {}) {
+  const el = document.getElementById('intro');
+  if (!el || introOpen) return;
+  if (!force) {
+    try { if (localStorage.getItem(INTRO_KEY)) return; } catch (_) {}
+  }
+
+  const input = document.getElementById('intro-input');
+  const go = document.getElementById('intro-go');
+  const hint = document.getElementById('intro-hint');
+  const form = document.getElementById('intro-gate');
+
+  introOpen = true;
+  el.hidden = false;
+  document.body.classList.add('intro-open');
+  lenis.stop();                                   // the room holds still behind it
+  // rAF is paused while the tab is in the background, and a gate that never
+  // fades in is a gate nobody can read. Belt and braces; add is idempotent.
+  const reveal = () => el.classList.add('is-open');
+  requestAnimationFrame(reveal);
+  setTimeout(reveal, 60);
+  setTimeout(() => input && input.focus({ preventScroll: true }), 420);
+
+  const typed = () => input.value.trim().toLowerCase();
+  const ready = () => typed() === INTRO_WORD;
+
+  if (introBound) return;
+  introBound = true;
+
+  input.addEventListener('input', () => {
+    const ok = ready();
+    go.disabled = !ok;
+    input.classList.toggle('is-ready', ok);
+    if (hint.textContent) { hint.textContent = ''; hint.classList.remove('is-warn'); }
+  });
+
+  form.addEventListener('submit', (e) => {
+    e.preventDefault();
+    if (!ready()) {
+      hint.textContent = typed()
+        ? 'Not quite. Type the word ' + INTRO_WORD + ' to continue.'
+        : 'Type the word ' + INTRO_WORD + ' to continue.';
+      hint.classList.add('is-warn');
+      input.focus({ preventScroll: true });
+      return;
+    }
+    closeIntro();
+  });
+
+  // Tab must not escape the panel while it is the only thing you can use.
+  el.addEventListener('keydown', (e) => {
+    if (e.key !== 'Tab') return;
+    const focusable = [input, go].filter((n) => n && !n.disabled);
+    if (!focusable.length) return;
+    const first = focusable[0], last = focusable[focusable.length - 1];
+    if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+    else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+  });
+}
+
+function closeIntro() {
+  const el = document.getElementById('intro');
+  if (!el) return;
+  try { localStorage.setItem(INTRO_KEY, String(Date.now())); } catch (_) {}
+  el.classList.add('is-leaving');
+  el.classList.remove('is-open');
+  setTimeout(() => {
+    el.hidden = true;
+    el.classList.remove('is-leaving');
+    document.body.classList.remove('intro-open');
+    introOpen = false;
+    lenis.start();                                // hand the walk back
+  }, 620);
+}
+
+// so it can be shown again from the console, or wired to a help control later
+window.LLIntro = { show: () => openIntro({ force: true }), reset: () => { try { localStorage.removeItem(INTRO_KEY); } catch (_) {} } };
 
 // =============================================================================
 //  ASSET SEAM
