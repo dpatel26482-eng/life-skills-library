@@ -839,3 +839,30 @@ body.intro-open .v3-nav { opacity: 0; pointer-events: none; transition: opacity 
 @media (prefers-reduced-motion: reduce) {
   .intro, .intro-panel { transition: none; }
 }
+
+
+/* --------------------------------------------------- figures in the guide */
+.book-reader .page-figure {
+  margin: .9rem 0 .2rem;
+}
+.book-reader .page-figure a {
+  display: block;
+  border: 1px solid rgba(60, 44, 28, .22);
+  border-radius: .3rem;
+  overflow: hidden;
+  background: #fff;
+}
+.book-reader .page-figure img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+.book-reader .page-figure figcaption {
+  margin-top: .4rem;
+  font-size: .78em;
+  line-height: 1.4;
+  opacity: .72;
+}
+/* the sentence that introduces an outbound link */
+.book-reader .page-link { margin-top: .9rem; }
+.book-reader .link-intro { margin-bottom: .45rem; }

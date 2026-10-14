@@ -193,6 +193,32 @@
       '</a>';
   }
 
+  // A table or diagram sitting on the page. The figure links to the file itself
+  // so a dense image can be opened full size rather than squinted at.
+  function renderImage(b) {
+    return '<p class="page-kicker">' + (b.kicker || '') + '</p>' +
+      (b.heading ? '<h3>' + b.heading + '</h3>' : '') +
+      (b.body ? '<p>' + b.body + '</p>' : '') +
+      '<figure class="page-figure">' +
+        '<a href="' + b.src + '" target="_blank" rel="noopener noreferrer">' +
+          '<img src="' + b.src + '" alt="' + (b.alt || '') + '" loading="lazy">' +
+        '</a>' +
+        (b.caption ? '<figcaption>' + b.caption + '</figcaption>' : '') +
+      '</figure>';
+  }
+
+  // Any block can carry a link out to a source. The intro sentence says what is
+  // on the other end, so nobody has to click to find out whether it is worth it.
+  function renderLink(l) {
+    return '<div class="page-link">' +
+      (l.intro ? '<p class="link-intro">' + l.intro + '</p>' : '') +
+      '<a class="resource-link" href="' + l.href + '" target="_blank" rel="noopener noreferrer">' +
+        '<span class="resource-icon" aria-hidden="true">&#8599;</span>' +
+        '<span class="resource-text"><span class="resource-title">' + l.text + '</span>' +
+        (l.sub ? '<span class="resource-sub">' + l.sub + '</span>' : '') + '</span>' +
+      '</a></div>';
+  }
+
   function renderWritten(b, side) {
     return '' +
       '<div class="written-block" data-side="' + side + '">' +
@@ -282,6 +308,10 @@
   }
 
   function renderBlock(block, side) {
+    return blockBody(block, side) + (block.link ? renderLink(block.link) : '');
+  }
+
+  function blockBody(block, side) {
     switch (block.type) {
       case 'prose': return renderProse(block);
       case 'pullquote': return renderPullquote(block);
@@ -295,6 +325,7 @@
       case 'scenario': return renderScenario(block);
       case 'resource': return renderResource(block);
       case 'written': return renderWritten(block, side);
+      case 'image': return renderImage(block);
       default: return '';
     }
   }
