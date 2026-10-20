@@ -1,0 +1,58 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 560 352" width="560" height="352" role="img"
+     aria-label="Diagram. Gross wages have income tax withheld to become net wages in your bank account. Separately, the Super Guarantee of 12 per cent of ordinary time earnings is paid on top of wages into a super fund, taxed at 15 per cent on the way in, and held until a condition of release.">
+  <defs>
+    <marker id="a" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+      <path d="M0 0 L10 5 L0 10 z" fill="#5c4a33"/>
+    </marker>
+    <style>
+      .t  { font-family: Calibri, Carlito, "Segoe UI", system-ui, sans-serif; fill:#2d2419; }
+      .hd { font-size:12px; font-weight:700; letter-spacing:1.2px; fill:#8a6a3a; }
+      .bx { font-size:16px; font-weight:700; }
+      .sm { font-size:13px; fill:#5c4a33; }
+      .lb { font-size:12px; fill:#6b563c; font-style:italic; }
+      .box  { fill:#ffffff; stroke:#c9b48c; stroke-width:1.4; }
+      .boxg { fill:#fdf4e2; stroke:#c08f3c; stroke-width:1.6; }
+    </style>
+  </defs>
+
+  <text class="t hd" x="0" y="13">WHAT YOU EARN</text>
+  <rect class="box" x="0" y="24" width="246" height="56" rx="6"/>
+  <text class="t bx" x="14" y="48">Gross wages</text>
+  <text class="t sm" x="14" y="68">before any tax is taken</text>
+
+  <line x1="60" y1="80" x2="60" y2="118" stroke="#5c4a33" stroke-width="1.4" marker-end="url(#a)"/>
+  <text class="t lb" x="72" y="104">income tax withheld (PAYG)</text>
+
+  <rect class="box" x="0" y="122" width="246" height="56" rx="6"/>
+  <text class="t bx" x="14" y="146">Net wages</text>
+  <text class="t sm" x="14" y="166">what reaches your bank account</text>
+
+  <rect x="0" y="198" width="246" height="112" rx="6" fill="#f7efdd" stroke="#dcc9a6" stroke-width="1"/>
+  <text class="t sm" x="14" y="222" font-weight="700">The point of the split</text>
+  <text class="t sm" x="14" y="244">Your super is not deducted from</text>
+  <text class="t sm" x="14" y="262">your wages. It is an extra 12%</text>
+  <text class="t sm" x="14" y="280">paid alongside them, which is</text>
+  <text class="t sm" x="14" y="298">why it never shows in your net pay.</text>
+
+  <line x1="282" y1="8" x2="282" y2="330" stroke="#d9c6a2" stroke-width="1" stroke-dasharray="5 5"/>
+
+  <text class="t hd" x="310" y="13">PAID ON TOP OF YOUR WAGES</text>
+  <rect class="boxg" x="310" y="24" width="250" height="70" rx="6"/>
+  <text class="t bx" x="324" y="50">Super Guarantee</text>
+  <text class="t sm" x="324" y="70">12% of ordinary time earnings,</text>
+  <text class="t sm" x="324" y="86">paid by your employer</text>
+
+  <line x1="360" y1="94" x2="360" y2="132" stroke="#5c4a33" stroke-width="1.4" marker-end="url(#a)"/>
+  <text class="t lb" x="372" y="118">taxed at 15% on the way in</text>
+
+  <rect class="boxg" x="310" y="136" width="250" height="70" rx="6"/>
+  <text class="t bx" x="324" y="162">Your super fund</text>
+  <text class="t sm" x="324" y="182">invested in property, shares</text>
+  <text class="t sm" x="324" y="198">and bonds</text>
+
+  <line x1="360" y1="206" x2="360" y2="244" stroke="#5c4a33" stroke-width="1.4" marker-end="url(#a)"/>
+
+  <rect class="box" x="310" y="248" width="250" height="62" rx="6"/>
+  <text class="t bx" x="324" y="274">Locked away</text>
+  <text class="t sm" x="324" y="294">until a condition of release</text>
+</svg>

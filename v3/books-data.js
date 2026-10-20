@@ -642,119 +642,145 @@
       hotspot: { x: '20%', y: '54%' },
       spreads: [
         {
-          chapter: 'Why it matters',
+          chapter: 'What it is',
           left: {
             type: 'prose',
-            kicker: 'Why it matters',
-            heading: 'Why It Matters',
+            kicker: 'What is super?',
+            heading: 'What Super Is',
             paragraphs: [
-              "Superannuation is the only part of your income you won't see for decades, which makes it the easiest one to ignore completely. But it's also the part where starting early does more work than almost anything else you can do with money, because it has the most time to compound.",
-              'A fifteen-year-old with a casual job already has a super account quietly accumulating, or not. Whether it’s actually growing, whether the fees are reasonable, and whether it’s still there next time you check are all worth two minutes of attention now, instead of a surprise at 60.'
+              'Superannuation, often called &ldquo;super&rdquo;, is a compulsory, long-term savings system in Australia. It is designed to help workers build funds and accumulate money over time for their retirement.'
             ]
           },
           right: {
-            type: 'pullquote',
-            quote: 'The best time to start was your first payslip. The next best time is this one.',
-            list: [
-              "Super is paid on top of your wage, not out of it.",
-              "You can't touch it until 60. That's the whole point.",
-              'Fees are a percentage taken every year, forever, so smaller is better.'
-            ]
-          }
-        },
-        {
-          chapter: 'How it works',
-          left: {
             type: 'prose',
-            kicker: 'How it works',
+            kicker: 'How does super work?',
             heading: 'How It Works',
             paragraphs: [
-              'Superannuation is money paid on top of your wage, not out of it, your employer is required to contribute 12% of your ordinary earnings into a super fund, in addition to your pay, not deducted from it.',
-              "Once it arrives, it isn't just stored, it's invested, growing (or shrinking) with the market over decades, which is why fees matter: a fee is a percentage taken every single year, for as long as the account exists.",
-              'Your account is also “stapled” to you, it follows you from job to job unless you actively choose a new one, which stops duplicate accounts (and duplicate fees) piling up every time you start a new casual job. Since 1 July 2026, “Payday Super” also means your employer has to pay it within 7 business days of each payday, not just once a quarter, so it’s worth checking it actually lands.'
-            ]
-          },
-          right: {
-            type: 'table',
-            heading: 'Your wage vs. your super',
-            columns: ['', 'Wage', 'Super'],
-            rows: [
-              ['Paid', 'To you, each payday', 'To your fund, on top of your wage'],
-              ['Access', 'Now', 'From your preservation age (60)'],
-              ['Between jobs', 'Resets with a new employer', 'Stays with you, stapling'],
-              ['Growth', "Doesn't grow itself", 'Invested, compounds over decades']
+              'During your working life, your employer is legally required to pay a percentage of your earnings, known as the Superannuation Guarantee (SG), into a super fund on your behalf.',
+              'These superannuation funds then invest this money in a range of different modalities, such as property, shares and bonds, to grow your money over time.'
             ]
           }
         },
+
         {
-          chapter: 'Worked example',
+          chapter: 'Locked away',
           left: {
             type: 'prose',
-            kicker: 'Worked example',
-            heading: 'Worked Example, Starting at 18 vs. 28',
+            kicker: 'When can you get it?',
+            heading: 'Locked Away Until Later',
             paragraphs: [
-              'Two people, same job, same $55,000 salary, same 12% super guarantee, same average return, the only difference is when they started. One begins contributing at 18. The other starts an identical job, on identical terms, at 28: ten years later.',
-              "By a preservation age of 60, that ten-year head start is worth roughly double, not because they contributed more each year, but because their money had ten extra years to compound."
+              'Because the primary purpose of superannuation is to provide income after you retire, super is locked away until you reach your preservation age, currently 60 for anyone born after 1 July 1964, and satisfy a &ldquo;condition of release&rdquo;, such as retiring from work or turning 65.'
+            ],
+            link: {
+              intro: 'Retiring and turning 65 are only two of the ways a condition of release can be met, and the rest matter if your circumstances ever change. This ATO page sets out the full list and what each one allows you to withdraw.',
+              href: 'https://www.ato.gov.au/individuals-and-families/super-for-individuals-and-families/super/withdrawing-and-using-your-super',
+              text: 'Withdrawing and using your super (ATO)',
+              sub: 'Opens in a new tab on ato.gov.au'
+            }
+          },
+          right: {
+            type: 'image',
+            kicker: 'Where your pay goes',
+            heading: 'Wages And Super',
+            src: 'assets/super-pay-flow.svg',
+            alt: 'Diagram. Gross wages have income tax withheld to become net wages in your bank account. Separately, the Super Guarantee of 12 per cent of ordinary time earnings is paid on top of wages into a super fund, taxed at 15 per cent on the way in, and held until a condition of release.',
+            caption: 'Tap to open it full size. Super Guarantee rate and ordinary time earnings: Australian Taxation Office, How much super to pay. Concessional contributions tax rate: Moneysmart, Tax and super. Diagram drawn for this guide.'
+          }
+        },
+
+        {
+          chapter: 'Pay and tax',
+          left: {
+            type: 'prose',
+            kicker: 'Super as pre tax income',
+            heading: 'Gross And Net Wages',
+            paragraphs: [
+              'In Australia, there is gross wages and net wages. Gross wages is the wages you earn before the government taxes them. Net wages is what you get in your bank account after the tax has been paid to the government by your employer.',
+              'Under Australia&rsquo;s Superannuation Guarantee (SG), a person&rsquo;s employer must pay superannuation, currently 12%, on top of their ordinary time earnings. This 12% is not taxed as part of your wages.'
+            ],
+            link: {
+              intro: 'The Superannuation Guarantee rate has stepped up over several years and is set in law, so it is worth checking the current figure rather than assuming. This ATO page gives the rate and explains exactly which earnings it is calculated on.',
+              href: 'https://www.ato.gov.au/businesses-and-organisations/super-for-employers/paying-super-contributions/how-much-super-to-pay',
+              text: 'How much super to pay (ATO)',
+              sub: 'Opens in a new tab on ato.gov.au'
+            }
+          },
+          right: {
+            type: 'prose',
+            kicker: 'What happens to it',
+            heading: 'Taxed Inside The Fund',
+            paragraphs: [
+              'When your employer pays the 12% contribution into your super account, it is treated as a &ldquo;concessional contribution&rdquo;. The Australian Taxation Office (ATO) taxes this amount at a flat rate of 15% inside the fund, and will tax the money again when the fund is accessed.'
+            ],
+            link: {
+              intro: 'Super is taxed going in, while it is invested, and again when it comes out, at different rates each time. This Moneysmart page lays out all three so the 15% above sits in context rather than looking like the whole story.',
+              href: 'https://moneysmart.gov.au/how-super-works/tax-and-super',
+              text: 'Tax and super (Moneysmart)',
+              sub: 'Opens in a new tab on moneysmart.gov.au'
+            }
+          }
+        },
+
+        {
+          chapter: 'Types of fund',
+          left: {
+            type: 'prose',
+            kicker: 'Why are there different types?',
+            heading: 'Why There Are Several',
+            paragraphs: [
+              'Australia&rsquo;s superannuation system serves millions of workers with vastly different income levels, career paths, risk tolerances, and financial goals. Because one single fund cannot cater to everyone, there are distinct types of funds.'
             ]
           },
           right: {
-            type: 'barchart',
-            heading: 'Balance at 60 (today’s dollars)',
-            bars: [
-              { label: 'Starting at 18', value: 706000, display: '$706,000' },
-              { label: 'Starting at 28', value: 337000, display: '$337,000' }
+            type: 'toolkit',
+            heading: 'The Four Types',
+            items: [
+              '<strong>Industry super funds.</strong> Created for workers in specific industries like health and construction, most industry funds are now open to everyone. They are run as profit for member entities, meaning profits are returned to members rather than external shareholders.',
+              '<strong>Retail super funds.</strong> Operated by financial institutions, investment managers, or banks, these funds are run by profit making companies.',
+              '<strong>Self managed super funds.</strong> Private super funds, for up to six people, where the members act as the trustees responsible for managing the fund under Australian Taxation Office (ATO) oversight.',
+              '<strong>Corporate super funds.</strong> Established by large companies exclusively for their employees. Within these funds, the employer often negotiates discounted administration fees or subsidises insurance costs for workers.'
             ],
-            caption: 'Illustrative only. Assumes a constant $55,000 salary, 12% employer contributions, and an average return of roughly 6.5% p.a. after fees and tax, in today’s dollars. Real outcomes depend on salary, fund performance and fees, check your own fund’s calculator for a personal projection.'
+            link: {
+              intro: 'Each type carries its own fee structure, insurance cover and governance, and the differences are easier to judge side by side. This Moneysmart page compares the four and flags what to look at before committing to any of them.',
+              href: 'https://moneysmart.gov.au/how-super-works/types-of-super-funds',
+              text: 'Types of super funds (Moneysmart)',
+              sub: 'Opens in a new tab on moneysmart.gov.au'
+            }
           }
         },
+
         {
-          chapter: 'Questions',
-          left: {
-            type: 'question',
-            prompt: 'Your employer pays 12% super guarantee on your wages. Where does that 12% come from?',
-            options: [
-              'It’s deducted from your take-home pay',
-              'It’s paid on top of your wage, by your employer',
-              'You have to transfer it yourself each payday'
-            ],
-            correct: 1,
-            explanation: "Super guarantee is paid in addition to your wage, not carved out of it. It's a separate contribution your employer is required to make."
-          },
-          right: {
-            type: 'question',
-            prompt: "You've had three casual jobs and might have three separate super accounts. Why does that matter?",
-            options: [
-              'It doesn’t, more accounts means more savings',
-              'Each account can charge its own fees, quietly shrinking your balance',
-              'The ATO automatically merges them for free every year'
-            ],
-            correct: 1,
-            explanation: "Multiple accounts usually means multiple sets of fees, all chipping away at your balance. Consolidating into one account, after checking for any insurance you'd lose, usually leaves you better off."
-          }
-        },
-        {
-          chapter: 'Toolkit',
+          chapter: 'Find your fund',
           left: {
             type: 'toolkit',
-            heading: 'This Week',
+            heading: 'Finding And Comparing',
+            intro: 'How to find your super fund, or weigh up the alternatives:',
             items: [
-              'Log into your super account (or find your latest statement) and check the balance is actually growing.',
-              'Check how many super accounts you have, if it’s more than one, look into consolidating them.',
-              'Compare your fund’s fees against at least one other fund using a comparison tool.',
-              'After your next payday, check the 12% super contribution actually landed in your account.'
-            ]
+              '<strong>Check your current super via myGov.</strong> Log into your myGov account linked to the ATO. Under the Super tab, you will see a list of all active, inactive, or lost super accounts in your name.',
+              '<strong>Use government comparison tools.</strong> Visit the ATO&rsquo;s YourSuper comparison tool, accessible via myGov, or the Moneysmart super comparison tool, to compare performance, fees, and features across public APRA regulated funds.',
+              '<strong>Review fund product disclosure statements.</strong> When researching a specific fund online, check its official PDS document to evaluate fees, default insurance cover, and investment menus before transferring your balance.'
+            ],
+            link: {
+              intro: 'The ATO ranks every MySuper product on fees and past performance in one table, which is the fastest way to see whether the fund you are already in is a reasonable one.',
+              href: 'https://www.ato.gov.au/calculators-and-tools/yoursuper-comparison-tool',
+              text: 'YourSuper comparison tool (ATO)',
+              sub: 'Opens in a new tab on ato.gov.au'
+            }
           },
           right: {
-            type: 'glossary',
-            heading: 'Glossary',
-            terms: [
-              { term: 'Super guarantee (SG)', def: 'The minimum percentage of your wage your employer must pay into your super, on top of your pay.' },
-              { term: 'Preservation age', def: 'The age, 60, for most people today, you can generally access your super.' },
-              { term: 'Stapling', def: 'Your super account “follows” you between jobs unless you actively choose a new one.' },
-              { term: 'Consolidating', def: 'Combining multiple super accounts into one, to stop paying multiple sets of fees.' },
-              { term: 'Compounding', def: 'Investment returns earning their own returns over time, why starting early matters so much.' },
-              { term: 'Concessional contributions', def: 'Contributions taxed at 15% going in, like employer SG, generally lower than income tax.' }
-            ]
+            type: 'resource',
+            kicker: 'Before you switch',
+            heading: 'Choosing A Fund',
+            body: 'Comparing funds is only half of it. Moving your balance affects the insurance attached to your old account, and it can be worth keeping for reasons that have nothing to do with fees.',
+            href: 'https://moneysmart.gov.au/how-super-works/choosing-a-super-fund',
+            linkText: 'Choosing a super fund (Moneysmart)',
+            linkSub: 'Opens in a new tab on moneysmart.gov.au',
+            link: {
+              intro: 'And if you have ended up with several accounts from different jobs, each one is charging its own fees against your balance. This page covers bringing them together and what to check first.',
+              href: 'https://moneysmart.gov.au/how-super-works/getting-your-super',
+              text: 'Getting your super (Moneysmart)',
+              sub: 'Opens in a new tab on moneysmart.gov.au'
+            }
           }
         }
       ]
