@@ -636,13 +636,13 @@
     {
       id: 'super',
       number: 'III',
-      title: 'Super',
+      title: 'Superannuation',
       tagline: "the money you can't touch yet",
       spineClass: 'spine-super',
       hotspot: { x: '20%', y: '54%' },
       spreads: [
         {
-          chapter: 'What it is',
+          chapter: 'Definition',
           left: {
             type: 'prose',
             kicker: 'What is super?',
@@ -663,7 +663,7 @@
         },
 
         {
-          chapter: 'Locked away',
+          chapter: 'Conditions of super',
           left: {
             type: 'prose',
             kicker: 'When can you get it?',
@@ -726,7 +726,7 @@
           left: {
             type: 'prose',
             kicker: 'Why are there different types?',
-            heading: 'Why There Are Several',
+            heading: 'Why There Are Different Forms?',
             paragraphs: [
               'Australia&rsquo;s superannuation system serves millions of workers with vastly different income levels, career paths, risk tolerances, and financial goals. Because one single fund cannot cater to everyone, there are distinct types of funds.'
             ]
@@ -750,7 +750,7 @@
         },
 
         {
-          chapter: 'Find your fund',
+          chapter: 'Locating super',
           left: {
             type: 'toolkit',
             heading: 'Finding And Comparing',
@@ -781,6 +781,155 @@
               text: 'Getting your super (Moneysmart)',
               sub: 'Opens in a new tab on moneysmart.gov.au'
             }
+          }
+        },
+
+        {
+          chapter: 'Scenario',
+          left: {
+            type: 'scenario',
+            kicker: 'Scenario',
+            heading: 'Noah, 19',
+            paragraphs: [
+              'Noah has just started his first full time job. His ordinary time earnings are <strong>$30,000</strong> a year, and his employer pays the Superannuation Guarantee of <strong>12%</strong> on top of that into a super fund in his name.',
+              'He has worked three casual jobs before this one, and thinks he may have opened a super account at each of them without ever checking.',
+              'Noah has asked his manager whether he can stop the super and take the money as wages instead. He believes super is coming <strong>out of his pay</strong>, and that he is losing roughly $3,600 a year he could be spending now.'
+            ],
+            facts: [
+              { label: 'Ordinary time earnings', value: '$30,000' },
+              { label: 'Super Guarantee rate', value: '12%' },
+              { label: 'Paid into super', value: '$3,600' },
+              { label: 'Tax inside the fund (15%)', value: '$540' },
+              { label: 'Lands in his fund', value: '$3,060' },
+              { label: 'Taken out of his wages', value: '$0', isTotal: true }
+            ]
+          },
+          right: {
+            type: 'question',
+            prompt: 'Noah believes the $3,600 is coming out of his pay. Why is he wrong?',
+            options: [
+              'Super is deducted from wages, but his employer refunds it later',
+              'The Superannuation Guarantee is paid on top of his ordinary time earnings, so his wages are untouched',
+              'Super only comes out of pay once someone earns above $45,000'
+            ],
+            correct: 1,
+            explanation: 'Under the Superannuation Guarantee, an employer must pay superannuation, currently 12%, on top of ordinary time earnings. It sits alongside his wages rather than being taken from them, which is why stopping it would not add a cent to his take home pay.'
+          }
+        },
+
+        {
+          chapter: 'Check yourself',
+          left: {
+            type: 'question',
+            prompt: 'The $3,600 arrives in Noah&rsquo;s fund as a concessional contribution. What happens to it there?',
+            options: [
+              'Nothing, it is taxed only when he withdraws it at 60',
+              'The ATO taxes it at a flat 15% inside the fund, leaving $3,060',
+              'It is taxed at his marginal income tax rate, the same as his wages'
+            ],
+            correct: 1,
+            explanation: 'The Australian Taxation Office taxes a concessional contribution at a flat rate of 15% inside the fund. On $3,600 that is $540, leaving $3,060 invested. The flat 15% is lower than most marginal income tax rates, which is the concession.'
+          },
+          right: {
+            type: 'question',
+            prompt: 'Noah was born in 2007. When will he be able to take this money out?',
+            options: [
+              'At any time, provided he gives his fund 30 days notice',
+              'At his preservation age, currently 60, and once he satisfies a condition of release',
+              'At 65 exactly, with no exceptions'
+            ],
+            correct: 1,
+            explanation: 'Super is locked away until you reach your preservation age, currently 60 for anyone born after 1 July 1964, and satisfy a condition of release, such as retiring from work or turning 65. Both have to be true, which is why the money cannot simply be withdrawn early.'
+          }
+        },
+
+        {
+          chapter: 'Lost accounts',
+          left: {
+            type: 'question',
+            prompt: 'Noah thinks he has an account from each of his three old casual jobs. What is the quickest way to find out?',
+            options: [
+              'Ring each former employer and ask which fund they used',
+              'Log into myGov linked to the ATO and look under the Super tab',
+              'Wait for the funds to write to him at the end of the financial year'
+            ],
+            correct: 1,
+            explanation: 'Logging into a myGov account linked to the ATO shows a list of all active, inactive, or lost super accounts in your name, under the Super tab. It is the one place every account appears, whoever the employer was.'
+          },
+          right: {
+            type: 'question',
+            prompt: 'Before moving his balances into a single fund, what should Noah check?',
+            options: [
+              'Only which fund has the lowest administration fee',
+              'The product disclosure statement of each fund, including fees, default insurance cover and investment menus',
+              'Nothing, since all APRA regulated funds are required to be identical'
+            ],
+            correct: 1,
+            explanation: 'When researching a specific fund, check its official PDS document to evaluate fees, default insurance cover, and investment menus before transferring your balance. Insurance matters in particular, because closing an old account can end cover that would be harder to replace later.'
+          }
+        },
+
+        {
+          chapter: 'Write it out',
+          left: {
+            type: 'written',
+            prompt: 'In your own words, explain why superannuation does not reduce the amount of money that reaches someone&rsquo;s bank account.',
+            hint: 'Two or three sentences is plenty. It may help to use the words gross, net and on top.',
+            example: 'Super is not taken out of your wages. Under the Superannuation Guarantee the employer pays 12% of your ordinary time earnings on top of what you are paid, into a separate super fund. Your gross wages and the tax taken from them are unchanged, so your net wages, the money that reaches your bank account, are exactly the same whether the super is paid or not.',
+            keywords: [
+              'on top|not taken from|not deducted|separate|extra',
+              'employer|superannuation guarantee|sg',
+              '12|twelve per cent|twelve percent',
+              'ordinary time earnings|wages|earnings',
+              'net|take home|bank account|unchanged|same'
+            ]
+          },
+          right: {
+            type: 'written',
+            prompt: 'Noah has found four super accounts in his name. Explain what he should look at before combining them, and why fees alone are not enough.',
+            hint: 'Think about what else is attached to an old account besides a balance.',
+            example: 'Noah should read the product disclosure statement for each fund and compare the fees, the default insurance cover and the investment menu, rather than picking on fees alone. Each account is charging its own fees against his balance, so combining them usually saves money, but closing an old account also ends any insurance attached to it. He could lose cover that would be harder or more expensive to get back later, so he should check what he is giving up before transferring.',
+            keywords: [
+              'product disclosure statement|pds',
+              'fees',
+              'insurance|cover',
+              'investment|menu|options',
+              'lose|lost|ends|give up|cancel'
+            ]
+          }
+        },
+
+        {
+          chapter: 'Glossary',
+          left: {
+            type: 'glossary',
+            heading: 'Glossary',
+            terms: [
+              { term: 'Superannuation (super)', def: 'A compulsory, long term savings system in Australia, designed to help workers accumulate money over time for their retirement.' },
+              { term: 'Superannuation Guarantee (SG)', def: 'The percentage of your earnings, currently 12%, that an employer is legally required to pay into a super fund on your behalf.' },
+              { term: 'Ordinary time earnings', def: 'The earnings the Superannuation Guarantee is calculated on, broadly what you are paid for your ordinary hours of work.' },
+              { term: 'Gross wages', def: 'The wages you earn before the government taxes them.' },
+              { term: 'Net wages', def: 'What reaches your bank account after your employer has paid the tax to the government.' },
+              { term: 'Concessional contribution', def: 'Money paid into super before tax, such as the employer&rsquo;s 12%, taxed at a flat 15% inside the fund rather than at your marginal rate.' },
+              { term: 'Preservation age', def: 'The age at which super becomes available, currently 60 for anyone born after 1 July 1964.' },
+              { term: 'Condition of release', def: 'An event that must also be satisfied before super can be withdrawn, such as retiring from work or turning 65.' },
+              { term: 'Super fund', def: 'The organisation that holds your super and invests it in assets such as property, shares and bonds.' }
+            ]
+          },
+          right: {
+            type: 'glossary',
+            heading: 'Glossary, continued',
+            terms: [
+              { term: 'Industry super fund', def: 'A fund created for workers in a specific industry, run as a profit for member entity so profits return to members rather than external shareholders.' },
+              { term: 'Retail super fund', def: 'A fund operated by a financial institution, investment manager or bank, run by a profit making company.' },
+              { term: 'Self managed super fund', def: 'A private fund for up to six people, where the members act as trustees and manage it under ATO oversight.' },
+              { term: 'Corporate super fund', def: 'A fund established by a large company exclusively for its employees, often with discounted fees or subsidised insurance.' },
+              { term: 'Trustee', def: 'The person or body legally responsible for running a super fund in the interests of its members.' },
+              { term: 'myGov', def: 'The government account that, once linked to the ATO, lists every active, inactive or lost super account in your name.' },
+              { term: 'Lost super', def: 'An account your fund can no longer contact you about, or one that has been inactive, often left behind after changing jobs.' },
+              { term: 'APRA regulated fund', def: 'A public super fund supervised by the Australian Prudential Regulation Authority, which is what the government comparison tools cover.' },
+              { term: 'Product disclosure statement (PDS)', def: 'A fund&rsquo;s official document setting out its fees, default insurance cover and investment menus.' }
+            ]
           }
         }
       ]
