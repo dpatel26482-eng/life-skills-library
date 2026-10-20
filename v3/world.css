@@ -334,6 +334,14 @@ body.is-reading .scroll-track { opacity: 0; transition: opacity .45s ease; }
    spread means any residual seam is the same colour as the paper, and the
    leaf overlaps by a pixel so there is no gap to see. */
 .book-reader .spread { background: var(--parchment-dim); border-radius: 16px; }
+/* The spine shading sat at z-index 3 and the turning leaf at 4, so a page in
+   motion painted straight over the gutter: the soft shadow disappeared for the
+   length of the turn and snapped back the instant the leaf was put away. That
+   blink, at both ends of every turn in every book, is the crease glitch.
+   Lifting the shading above the leaf keeps the crease continuous, and darkens
+   the turning page as it passes through the gutter, which is what paper does.
+   It is pointer-events: none, so nothing becomes unclickable. */
+.book-reader .spread::before { z-index: 5; }
 .book-reader .leaf {
   will-change: transform;
 }
