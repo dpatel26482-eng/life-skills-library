@@ -991,8 +991,14 @@ img{ max-width:100%; display:block; }
 .reader-nav.primary{ background:var(--gold); border-color:var(--gold); color:#241505; font-weight:600; }
 .reader-nav.primary:hover:not(:disabled){ background:var(--gold-soft); }
 .reader-position{ font-family:var(--font-ui); font-size:.76rem; letter-spacing:.1em; text-transform:uppercase; color:rgba(247,239,224,.45); margin:0; text-align:center; }
-.page h3{ font-size:1.25rem; color:var(--ink); margin:0 0 .8rem; }
-.page p{ font-size:.95rem; margin:0 0 .85rem; color:var(--ink-soft); }
+/* The turning leaf holds a clone of a page, so every rule that styles page
+   content has to reach .leaf-face as well. Scoped to .page alone, these two
+   did not apply inside the leaf: h3 lost its 12.8px bottom margin entirely and
+   p dropped from 13.6px to the 8px that .page-kicker sets at lower specificity.
+   The copy on the leaf came out 18px shorter than the page beneath it, so the
+   text jumped at the crease the instant the leaf was taken away. */
+.page h3, .leaf-face h3{ font-size:1.25rem; color:var(--ink); margin:0 0 .8rem; }
+.page p, .leaf-face p{ font-size:.95rem; margin:0 0 .85rem; color:var(--ink-soft); }
 .page-kicker{
   font-family:var(--font-ui); text-transform:uppercase; letter-spacing:.1em; font-size:.875rem;
   font-weight:700; color:var(--ink-soft); opacity:.7; margin:0 0 .5rem;

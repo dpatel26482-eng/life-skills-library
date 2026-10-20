@@ -474,6 +474,8 @@
       leafEl.classList.remove('is-flipping');
       leafFront.replaceChildren();
       leafBack.replaceChildren();
+      leafFront.style.paddingRight = '';
+      leafBack.style.paddingRight = '';
       flipping = false;
     }
     function onEnd(e) { if (e.target === leafEl && e.propertyName === 'transform') settle(); }
@@ -481,13 +483,22 @@
     setTimeout(settle, 1100);
   }
 
-  // live child nodes, detached and safe to hand to a leaf face
+  // Live child nodes, detached and safe to hand to a leaf face, along with the
+  // width of the source page's scrollbar. A page that overflows carries a 7px
+  // scrollbar and so has a content box 7px narrower than the leaf, which
+  // scrolls nothing and reserves nothing. Copy the text across without
+  // accounting for that and it re-wraps on the leaf, so lines and images shift
+  // the moment the leaf is removed. Carrying the gutter keeps both identical.
   function snapshot(el) {
-    return Array.prototype.map.call(el.childNodes, function (n) { return n.cloneNode(true); });
+    return {
+      nodes: Array.prototype.map.call(el.childNodes, function (n) { return n.cloneNode(true); }),
+      gutter: el.offsetWidth - el.clientWidth
+    };
   }
 
-  function fillFace(face, nodes) {
-    face.replaceChildren.apply(face, nodes);
+  function fillFace(face, snap) {
+    face.replaceChildren.apply(face, snap.nodes);
+    face.style.paddingRight = snap.gutter ? 'calc(2.1rem + ' + snap.gutter + 'px)' : '';
     Array.prototype.forEach.call(face.querySelectorAll('img'), function (img) {
       img.loading = 'eager';
     });
