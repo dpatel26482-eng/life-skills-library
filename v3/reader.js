@@ -158,7 +158,7 @@
   function renderQuestion(b, side) {
     return '' +
       '<div class="question-block">' +
-        '<p class="page-kicker">Check yourself</p>' +
+        '<p class="page-kicker">Question</p>' +
         '<p class="question-prompt">' + b.prompt + '</p>' +
         '<ul class="option-list">' +
           b.options.map(function (opt, i) {

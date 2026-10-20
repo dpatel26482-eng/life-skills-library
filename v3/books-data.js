@@ -184,7 +184,7 @@
         },
 
         {
-          chapter: 'Scenario II',
+          chapter: 'Questions',
           left: {
             type: 'question',
             prompt: 'Which of Jordan&rsquo;s costs would be the most reasonable first target for cutting back?',
@@ -206,7 +206,7 @@
         },
 
         {
-          chapter: 'Check yourself',
+          chapter: 'Questions II',
           left: {
             type: 'question',
             prompt: 'Which of these best describes a budget?',
@@ -232,7 +232,7 @@
         },
 
         {
-          chapter: 'Write it out',
+          chapter: 'Worded questions',
           left: {
             type: 'written',
             prompt: 'In your own words, explain the difference between a need and a want, and why the order matters in a budget.',
@@ -507,7 +507,7 @@
         },
 
         {
-          chapter: 'Scenario II',
+          chapter: 'Questions',
           left: {
             type: 'question',
             prompt: 'Mia&rsquo;s uniform cost $150 and she kept the receipts. What does claiming it as a deduction actually do?',
@@ -533,7 +533,7 @@
         },
 
         {
-          chapter: 'Check yourself',
+          chapter: 'Questions II',
           left: {
             type: 'question',
             prompt: 'When does the Australian financial year run?',
@@ -559,7 +559,7 @@
         },
 
         {
-          chapter: 'Write it out',
+          chapter: 'Worded questions',
           left: {
             type: 'written',
             prompt: 'In your own words, explain what a progressive tax system is, and why moving into a higher tax bracket does not mean all of your income is taxed at that higher rate.',
@@ -818,7 +818,7 @@
         },
 
         {
-          chapter: 'Check yourself',
+          chapter: 'Questions',
           left: {
             type: 'question',
             prompt: 'The $3,600 arrives in Noah&rsquo;s fund as a concessional contribution. What happens to it there?',
@@ -844,7 +844,7 @@
         },
 
         {
-          chapter: 'Lost accounts',
+          chapter: 'Questions II',
           left: {
             type: 'question',
             prompt: 'Noah thinks he has an account from each of his three old casual jobs. What is the quickest way to find out?',
@@ -870,7 +870,7 @@
         },
 
         {
-          chapter: 'Write it out',
+          chapter: 'Worded questions',
           left: {
             type: 'written',
             prompt: 'In your own words, explain why superannuation does not reduce the amount of money that reaches someone&rsquo;s bank account.',
